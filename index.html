@@ -81,11 +81,16 @@
   .funnel-connector.biggest .pill-info{background:var(--rose-bg);border-color:var(--rose);color:var(--rose-ink);font-weight:600;padding:6px 12px 6px 9px}
   .funnel-connector.biggest .pill-info svg{color:var(--rose-ink);transform:rotate(180deg)}
   /* Conversion-rates block between Orders and Revenue */
-  .conv-block{width:88%;margin:6px auto;background:#faf6ff;border:1px dashed #d4c1ed;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:5px}
-  .conv-block .cb-title{font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:#6f2da8;margin-bottom:2px;text-align:center}
-  .conv-block .cb-row{display:flex;justify-content:space-between;align-items:baseline;font-variant-numeric:tabular-nums;font-size:11px}
-  .conv-block .cb-row .lbl{color:var(--ink-soft);font-weight:500}
-  .conv-block .cb-row .val{font-weight:700;color:#6f2da8;font-size:13px}
+  .conv-block{width:92%;margin:6px auto;background:#faf6ff;border:1px dashed #d4c1ed;border-radius:12px;padding:10px 8px;display:flex;flex-direction:column;gap:6px}
+  .conv-block .cb-title{font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:#6f2da8;text-align:center}
+  .conv-block .cb-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+  .conv-block .cb-col{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 6px;border-right:1px dashed #e2d3f0;min-width:0}
+  .conv-block .cb-col:last-child{border-right:none}
+  .conv-block .cb-col .lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);font-weight:600;text-align:center;white-space:nowrap;line-height:1.2}
+  .conv-block .cb-col .vals{display:flex;flex-direction:column;align-items:center;gap:1px;font-variant-numeric:tabular-nums;line-height:1.2}
+  .conv-block .cb-col .pass{font-weight:800;color:#16a34a;font-size:13px}
+  .conv-block .cb-col .drop{font-weight:800;color:#dc2626;font-size:13px}
+  .conv-block .cb-col .none{color:var(--ink-muted);font-size:12px}
   /* Revenue final block */
   .funnel-step.revenue{background:linear-gradient(135deg,#6f2da8 0%,#9659cf 100%);border:none;color:#fff}
   .funnel-step.revenue .fs-icon{background:rgba(255,255,255,0.22);color:#fff}
@@ -724,13 +729,19 @@ function renderFunnelColumn(pae,pk){
     }
     // Insert conversion-rates block + connector right before the Revenue step
     if(s.id==="revenue"){
-      const fmtRate=v=>(v==null||isNaN(v))?'—':v.toFixed(2)+'%';
       h+='<div class="funnel-connector"></div>';
+      const fmtPair=v=>{
+        if(v==null||isNaN(v)) return '<span class="none">—</span>';
+        const drop=100-v;
+        return '<span class="pass">'+v.toFixed(2)+'% pass</span><span class="drop">'+drop.toFixed(2)+'% drop</span>';
+      };
       h+='<div class="conv-block">'
        +'<div class="cb-title">Direct-to-order conversion</div>'
-       +'<div class="cb-row"><span class="lbl">Lead → Order %</span><span class="val">'+fmtRate(lead2order)+'</span></div>'
-       +'<div class="cb-row"><span class="lbl">Valid Lead → Order %</span><span class="val">'+fmtRate(valid2order)+'</span></div>'
-       +'<div class="cb-row"><span class="lbl">Home Visits → Order %</span><span class="val">'+fmtRate(visit2order)+'</span></div>'
+       +'<div class="cb-grid">'
+       +'<div class="cb-col"><div class="lbl">Lead &rarr; Order %</div><div class="vals">'+fmtPair(lead2order)+'</div></div>'
+       +'<div class="cb-col"><div class="lbl">Valid Lead &rarr; Order %</div><div class="vals">'+fmtPair(valid2order)+'</div></div>'
+       +'<div class="cb-col"><div class="lbl">Home Visits &rarr; Order %</div><div class="vals">'+fmtPair(visit2order)+'</div></div>'
+       +'</div>'
        +'</div>';
       h+='<div class="funnel-connector"></div>';
     }
