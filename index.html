@@ -52,32 +52,49 @@
   .tab-btn.active{background:#6f2da8;color:#fff;border-color:#6f2da8}
   .tab-content{display:none}
   .tab-content.active{display:block}
-  .funnel{max-width:920px;margin:0 auto;padding:8px 0}
-  .funnel-step{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 24px;margin:0 auto;display:grid;grid-template-columns:160px 1fr auto;column-gap:20px;align-items:center;transition:max-width 200ms ease}
-  .funnel-step.s1{max-width:100%}
-  .funnel-step.s2{max-width:90%}
-  .funnel-step.s3{max-width:78%}
-  .funnel-step.s4{max-width:66%}
-  .funnel-step.s5{max-width:54%}
-  .funnel-step.revenue{max-width:78%;background:linear-gradient(135deg,#6f2da8 0%,#9659cf 100%);border:none;color:#fff}
-  .fs-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:#6f2da8;line-height:1.2}
-  .funnel-step.revenue .fs-label{color:rgba(255,255,255,0.85)}
-  .fs-value{font-size:30px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-0.01em;line-height:1.05}
-  .funnel-step.revenue .fs-value{color:#fff;font-size:34px}
-  .fs-meta{text-align:right;font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums;line-height:1.5}
+  /* ===== Funnel — three side-by-side journeys (Lifetime / L30 / L7) ===== */
+  .funnels-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:6px}
+  @media (max-width:1100px){.funnels-row{grid-template-columns:1fr}}
+  .funnel-column{display:flex;flex-direction:column;align-items:center;gap:0}
+  .fc-title{font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:#6f2da8;margin:0 0 14px;text-align:center;padding:6px 14px;border:1px solid #e6dcf2;background:#f6f0fb;border-radius:999px}
+  .funnel-step{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;display:grid;grid-template-columns:auto auto 1fr auto;column-gap:12px;align-items:center;transition:width 200ms ease}
+  .funnel-step.s1{width:100%}
+  .funnel-step.s2{width:96%}
+  .funnel-step.s3{width:88%}
+  .funnel-step.s4{width:80%}
+  .funnel-step.s5{width:72%}
+  .funnel-step.revenue{width:100%}
+  .fs-icon{width:38px;height:38px;border-radius:50%;background:#ede4f7;color:#6f2da8;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .fs-icon svg{width:20px;height:20px;stroke-width:2}
+  .fs-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:#6f2da8;white-space:nowrap}
+  .fs-value{font-size:26px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-0.01em;line-height:1.05;text-align:center}
+  .fs-meta{text-align:right;font-size:11px;color:var(--ink-muted);font-variant-numeric:tabular-nums;line-height:1.45;white-space:nowrap}
+  .fs-meta .conv{font-weight:700;color:#6f2da8}
+  .fs-meta .cost{display:block;color:var(--ink-muted);margin-top:1px}
+  /* Connector pill with arrow */
+  .funnel-connector{margin:8px auto;display:flex;align-items:center;justify-content:center;position:relative;width:100%;min-height:38px}
+  .funnel-connector::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;background:#dcd4c5;transform:translateX(-50%)}
+  .pill-info{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 12px 5px 9px;font-size:10.5px;color:var(--ink-soft);position:relative;z-index:1;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;line-height:1.2}
+  .pill-info svg{width:13px;height:13px;flex-shrink:0;stroke-width:2.4;color:var(--sage-ink)}
+  .pill-info .pass{font-weight:700;color:var(--sage-ink)}
+  .pill-info .drop{color:var(--ink-muted)}
+  .funnel-connector.biggest .pill-info{background:var(--rose-bg);border-color:var(--rose);color:var(--rose-ink);font-weight:600;padding:6px 12px 6px 9px}
+  .funnel-connector.biggest .pill-info svg{color:var(--rose-ink);transform:rotate(180deg)}
+  .funnel-connector.biggest .pill-info .pass,.funnel-connector.biggest .pill-info .drop{color:var(--rose-ink)}
+  .funnel-connector.biggest .pill-info .drop{font-weight:700}
+  /* Conversion-rates block between Orders and Revenue */
+  .conv-block{width:88%;margin:6px auto;background:#faf6ff;border:1px dashed #d4c1ed;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:5px}
+  .conv-block .cb-title{font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:#6f2da8;margin-bottom:2px;text-align:center}
+  .conv-block .cb-row{display:flex;justify-content:space-between;align-items:baseline;font-variant-numeric:tabular-nums;font-size:11px}
+  .conv-block .cb-row .lbl{color:var(--ink-soft);font-weight:500}
+  .conv-block .cb-row .val{font-weight:700;color:#6f2da8;font-size:13px}
+  /* Revenue final block */
+  .funnel-step.revenue{background:linear-gradient(135deg,#6f2da8 0%,#9659cf 100%);border:none;color:#fff}
+  .funnel-step.revenue .fs-icon{background:rgba(255,255,255,0.22);color:#fff}
+  .funnel-step.revenue .fs-label{color:rgba(255,255,255,0.92)}
+  .funnel-step.revenue .fs-value{color:#fff;font-size:24px}
   .funnel-step.revenue .fs-meta{color:rgba(255,255,255,0.85)}
-  .fs-meta .conv{font-weight:700;color:var(--sage-ink)}
-  .funnel-step.revenue .fs-meta .conv{color:#fff}
-  .fs-meta .cost{display:block;margin-top:2px;color:var(--ink-muted)}
-  .funnel-step.revenue .fs-meta .cost{color:rgba(255,255,255,0.7)}
-  .funnel-arrow{margin:8px auto;height:54px;display:flex;align-items:center;justify-content:center;position:relative;max-width:920px}
-  .funnel-arrow::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--line);transform:translateX(-50%)}
-  .funnel-arrow .drop-info{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:11.5px;color:var(--ink-soft);position:relative;z-index:1;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:8px;white-space:nowrap}
-  .funnel-arrow .drop-info b{color:var(--sage-ink);font-weight:700}
-  .funnel-arrow .drop-info .drop{color:var(--ink-muted)}
-  .funnel-arrow.biggest .drop-info{background:var(--rose-bg);border-color:var(--rose);color:var(--rose-ink);font-weight:600}
-  .funnel-arrow.biggest .drop-info b{color:var(--rose-ink)}
-  .funnel-arrow.biggest .drop-info .drop{color:var(--rose-ink);font-weight:700}
+  .funnel-step.revenue .fs-meta .conv,.funnel-step.revenue .fs-meta .cost{color:rgba(255,255,255,0.92)}
   .funnel-empty{text-align:center;padding:60px 24px;color:var(--ink-muted);font-size:13px}
   .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
   .chip{border:1px solid var(--line);background:var(--panel);color:var(--ink-soft);padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;cursor:pointer;user-select:none;transition:all 120ms ease}
@@ -645,53 +662,93 @@ async function loadFromPublicCSV(){
 
 async function load(){setStamp();const inCowork=!!(window.cowork&&typeof window.cowork.callMcpTool==="function");let bundle;try{bundle=inCowork?await loadFromCowork():await loadFromPublicCSV();}catch(err){const msg=err&&err.message?err.message:String(err);if(inCowork){showError("Couldn't load via Cowork's Drive MCP",msg);}else{showError("Couldn't fetch the published CSV",msg+"\n\nIf this is a CORS/network error in a file:// page, try a tiny local server:\n  python -m http.server 8000\nand open http://localhost:8000/privyr-creative-effectiveness.html\n\nAlso confirm the workbook is still set to File → Share → Publish to web,\nand that gid="+SHEET_GID+" is the Privyr CE tab.");}return;}const{ceRows,agrRows,agrError,pae,paeError}=bundle;if(!ceRows.length){showError("No active rows found",'The Privyr CE tab returned 0 rows where column F = "active".');return;}const agrMap=buildAGRMap(agrRows);mergeAGRIntoCE(ceRows,agrMap);state.rows=ceRows;state.totals=privyrTotals(agrRows);state.pae=pae||null;if(agrError){showError("Orders / Revenue (per-ad) not loaded",agrError+"\n\nFix: open the workbook → click the \"Ad Generated Revenue\" tab → look at the URL — the number after gid= is the value we need.","warn");}if(paeError){showError("Top-card period totals not loaded",paeError+"\n\nFix: open the workbook → click the \"Platform Ad Efficiency_Mktg\" tab → copy the number after gid= from the URL and send it to me.","warn");}renderTable();}
 
+// SVG icons for funnel steps (Lucide-style, currentColor, 2px stroke)
+const F_ICONS={
+  leads:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  valid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>',
+  bt:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6"/><path d="M9 16h4"/></svg>',
+  hv:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  orders:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>',
+  revenue:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>'
+};
+const F_ARROW_UP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>';
+const F_ARROW_DOWN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>';
+
 function renderFunnel(){
   const pae=state.pae||{};
-  const g=k=>(pae[k]&&typeof pae[k].lifetime==="number")?pae[k].lifetime:null;
+  const periods=[{key:"lifetime",label:"Lifetime"},{key:"l30",label:"Last 30 days"},{key:"l7",label:"Last 7 days"}];
+  let html='<div class="funnels-row">';
+  for(const p of periods){
+    html+='<div class="funnel-column">';
+    html+='<div class="fc-title">'+p.label+'</div>';
+    html+=renderFunnelColumn(pae,p.key);
+    html+='</div>';
+  }
+  html+='</div>';
+  const node=el('tab-funnel');
+  if(node) node.innerHTML=html;
+}
+
+function renderFunnelColumn(pae,pk){
+  const g=k=>(pae[k]&&typeof pae[k][pk]==="number")?pae[k][pk]:null;
+  // Direct-rate computations for the bridging block
+  const leadsV=g("leads"), validV=g("valid"), hvV=g("hv"), ordersV=g("orders");
+  const lead2order  = (leadsV  && leadsV>0  && ordersV!=null) ? (ordersV/leadsV)*100  : null;
+  const valid2order = (validV  && validV>0  && ordersV!=null) ? (ordersV/validV)*100  : null;
+  const visit2order = (hvV     && hvV>0     && ordersV!=null) ? (ordersV/hvV)*100     : null;
   const steps=[
-    {id:"leads",   label:"Leads",       value:g("leads"),   prevName:null,    conv:null,        costLbl:"CPL",  cost:g("cpl"),  fmt:fmtInt},
-    {id:"valid",   label:"Valid Leads", value:g("valid"),   prevName:"Leads", conv:g("l2v"),    costLbl:"CPVL", cost:g("cpvl"), fmt:fmtInt},
-    {id:"bt",      label:"Brief Taken", value:g("bt"),      prevName:"Valid", conv:g("v2b"),    costLbl:"CPBT", cost:g("cpbt"), fmt:fmtInt},
-    {id:"hv",      label:"Home Visits", value:g("hv"),      prevName:"Brief", conv:g("b2h"),    costLbl:"CPHV", cost:g("cphv"), fmt:fmtInt},
-    {id:"orders",  label:"Orders",      value:g("orders"),  prevName:"Visit", conv:g("h2o"),    costLbl:"CAC",  cost:g("cac"),  fmt:fmtInt},
-    {id:"revenue", label:"Revenue",     value:g("revenue"), prevName:"Orders",conv:null,        costLbl:"ROAS", cost:g("roas"), fmt:fmtINR0,isRevenue:true}
+    {id:"leads",   icon:F_ICONS.leads,   label:"Leads",       value:g("leads"),   prevName:null,    conv:null,        costLbl:"CPL",  cost:g("cpl"),  fmt:fmtInt},
+    {id:"valid",   icon:F_ICONS.valid,   label:"Valid Leads", value:g("valid"),   prevName:"Leads", conv:g("l2v"),    costLbl:"CPVL", cost:g("cpvl"), fmt:fmtInt},
+    {id:"bt",      icon:F_ICONS.bt,      label:"Brief Taken", value:g("bt"),      prevName:"Valid", conv:g("v2b"),    costLbl:"CPBT", cost:g("cpbt"), fmt:fmtInt},
+    {id:"hv",      icon:F_ICONS.hv,      label:"Home Visits", value:g("hv"),      prevName:"Brief", conv:g("b2h"),    costLbl:"CPHV", cost:g("cphv"), fmt:fmtInt},
+    {id:"orders",  icon:F_ICONS.orders,  label:"Orders",      value:g("orders"),  prevName:"Visit", conv:g("h2o"),    costLbl:"CAC",  cost:g("cac"),  fmt:fmtInt},
+    {id:"revenue", icon:F_ICONS.revenue, label:"Revenue",     value:g("revenue"), prevName:null,    conv:null,        costLbl:"ROAS", cost:g("roas"), fmt:fmtINR0,isRevenue:true}
   ];
+  // Biggest drop among steps with conv values
   let biggest=-1, biggestDrop=-1;
   for(let i=0;i<steps.length;i++){
     if(steps[i].conv!=null){
-      const drop=100-steps[i].conv;
-      if(drop>biggestDrop){biggestDrop=drop;biggest=i;}
+      const d=100-steps[i].conv;
+      if(d>biggestDrop){biggestDrop=d;biggest=i;}
     }
   }
-  let html='<div class="funnel">';
+  let h='';
   steps.forEach((s,i)=>{
-    if(i>0){
+    if(i>0 && s.id!=="revenue"){
       const isBig=(i===biggest);
       const conv=s.conv;
-      const drop=(conv==null)?null:(100-conv);
-      html+='<div class="funnel-arrow'+(isBig?' biggest':'')+'"><div class="drop-info">';
-      if(conv==null){
-        html+='<span>—</span>';
+      if(conv!=null){
+        const drop=100-conv;
+        h+='<div class="funnel-connector'+(isBig?' biggest':'')+'"><div class="pill-info">'+(isBig?F_ARROW_DOWN:F_ARROW_UP)+'<span>'+s.prevName+' &rarr; '+s.label.split(' ')[0]+': <span class="pass">'+conv.toFixed(1)+'%</span> pass &middot; <span class="drop">'+drop.toFixed(1)+'% drop</span>'+(isBig?' &middot; biggest drop':'')+'</span></div></div>';
       } else {
-        html+=s.prevName+' &rarr; '+s.label+': <b>'+conv.toFixed(1)+'%</b> pass &middot; <span class="drop">'+drop.toFixed(1)+'% drop</span>';
-        if(isBig) html+=' &middot; biggest drop';
+        h+='<div class="funnel-connector"></div>';
       }
-      html+='</div></div>';
+    }
+    // Insert conversion-rates block + connector right before the Revenue step
+    if(s.id==="revenue"){
+      const fmtRate=v=>(v==null||isNaN(v))?'—':v.toFixed(2)+'%';
+      h+='<div class="funnel-connector"></div>';
+      h+='<div class="conv-block">'
+       +'<div class="cb-title">Direct-to-order conversion</div>'
+       +'<div class="cb-row"><span class="lbl">Lead → Order %</span><span class="val">'+fmtRate(lead2order)+'</span></div>'
+       +'<div class="cb-row"><span class="lbl">Valid Lead → Order %</span><span class="val">'+fmtRate(valid2order)+'</span></div>'
+       +'<div class="cb-row"><span class="lbl">Home Visits → Order %</span><span class="val">'+fmtRate(visit2order)+'</span></div>'
+       +'</div>';
+      h+='<div class="funnel-connector"></div>';
     }
     const wcls='s'+Math.min(i+1,5);
     const valFmt=(s.value==null)?'—':s.fmt(s.value);
     const costFmt=(s.id==='revenue' ? (s.cost==null?'—':Number(s.cost).toFixed(2)+'x') : fmtINR0(s.cost));
-    const convLine=(s.conv==null)?('<span>'+(i===0?'Top of funnel':'—')+'</span>'):('<span class="conv">'+s.conv.toFixed(1)+'%</span> from '+s.prevName);
+    const convLine=(s.conv==null)?('<span>'+(i===0?'Top of funnel':'')+'</span>'):('<span class="conv">'+s.conv.toFixed(1)+'%</span> from '+s.prevName);
     const costLine=(s.cost==null)?'':('<span class="cost">'+s.costLbl+' '+costFmt+'</span>');
-    html+='<div class="funnel-step '+wcls+(s.isRevenue?' revenue':'')+'">'
-        +'<div class="fs-label">'+s.label+'</div>'
-        +'<div class="fs-value">'+valFmt+'</div>'
-        +'<div class="fs-meta">'+convLine+costLine+'</div>'
-        +'</div>';
+    h+='<div class="funnel-step '+wcls+(s.isRevenue?' revenue':'')+'">'
+       +'<div class="fs-icon">'+s.icon+'</div>'
+       +'<div class="fs-label">'+s.label+'</div>'
+       +'<div class="fs-value">'+valFmt+'</div>'
+       +'<div class="fs-meta">'+convLine+costLine+'</div>'
+       +'</div>';
   });
-  html+='</div>';
-  const node=el('tab-funnel');
-  if(node) node.innerHTML=html;
+  return h;
 }
 
 document.querySelectorAll('.tab-btn').forEach(btn=>{
