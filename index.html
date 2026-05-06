@@ -292,12 +292,14 @@
 </div>
 <script>
 (()=>{"use strict";
-const STORAGE_KEY="privyr-creative-effectiveness:v7";
+const STORAGE_KEY="privyr-creative-effectiveness:v8";
 const FILE_ID="1vE4GY-6l2YIBz5rWy6uKvHc8ReuFwBgS";
 const DRIVE_TOOL="mcp__66fa5073-4346-419f-88aa-c11cfb492155__read_file_content";
 const PUB_BASE="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDP0_BGmMv5wOX8VsPgLQ2EUkcRnYZOrl-4X0jAhFVAHkSGTh2Jx1ltQ671ALGOA/pub";
 const PUBHTML_URL=PUB_BASE+"html";
-const SHEET_GID="1292439970";
+const SHEET_GID="825204121"; // Creative Effectiveness_Privyr
+const AGR_GID="497381798"; // Ad Generated Revenue
+const PAE_GID="1240428045"; // Platform Ad Efficiency_Mktg
 const CSV_URL=PUB_BASE+"?output=csv&gid="+SHEET_GID;
 const AGR_TAB_NAME="Ad Generated Revenue";
 const PAE_TAB_NAME="Platform Ad Efficiency_Mktg";
@@ -564,18 +566,29 @@ async function loadFromCowork(){const resp=await window.cowork.callMcpTool(DRIVE
 
 async function discoverGidForTab(tabName){let html="";try{const r=await fetch(PUBHTML_URL,{method:"GET",cache:"no-store"});if(!r.ok)return null;html=await r.text();}catch(e){return null;}if(!html)return null;const escaped=tabName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const patterns=[new RegExp('"name":"'+escaped+'"\\s*,\\s*"gid":"?(\\d+)','i'),new RegExp('"gid":"?(\\d+)"?\\s*,\\s*"name":"'+escaped+'"','i'),new RegExp('id="sheet-button-(\\d+)"[^>]*>[^<]*'+escaped,'i'),new RegExp('gid=(\\d+)[^>]*>[^<]*'+escaped,'i')];for(const re of patterns){const m=re.exec(html);if(m&&m[1])return m[1];}return null;}
 
-async function loadFromPublicCSV(){const ceUrl=CSV_URL+"&_="+Date.now();const ceResp=await fetch(ceUrl,{method:"GET",cache:"no-store",redirect:"follow"});if(!ceResp.ok)throw new Error("Privyr CE HTTP "+ceResp.status+" "+ceResp.statusText);const ceText=await ceResp.text();if(!ceText||ceText.length<200)throw new Error("Published Privyr CE CSV came back empty.");const ceRows=parsePrivyrFromCSV(ceText);
-  // AGR tab (per-ad orders/revenue match)
-  let agrRows=[],agrError=null;
-  const agrGid=await discoverGidForTab(AGR_TAB_NAME);
-  if(!agrGid){agrError='Could not discover gid for "'+AGR_TAB_NAME+'" from the published workbook.';}
-  else{try{const agrUrl=PUB_BASE+"?output=csv&gid="+agrGid+"&_="+Date.now();const agrResp=await fetch(agrUrl,{method:"GET",cache:"no-store",redirect:"follow"});if(!agrResp.ok)throw new Error("HTTP "+agrResp.status);const agrText=await agrResp.text();if(agrText&&agrText.length>50)agrRows=parseAGRFromCSV(agrText);}catch(e){agrError="Found AGR gid="+agrGid+" but the fetch failed: "+(e.message||e);}}
-  // Platform Ad Efficiency_Mktg tab (top-card period totals)
-  let pae=null,paeError=null;
-  const paeGid=await discoverGidForTab(PAE_TAB_NAME);
-  if(!paeGid){paeError='Could not discover gid for "'+PAE_TAB_NAME+'" from the published workbook.';}
-  else{try{const paeUrl=PUB_BASE+"?output=csv&gid="+paeGid+"&_="+Date.now();const paeResp=await fetch(paeUrl,{method:"GET",cache:"no-store",redirect:"follow"});if(!paeResp.ok)throw new Error("HTTP "+paeResp.status);const paeText=await paeResp.text();if(paeText&&paeText.length>50)pae=parsePAEFromCSV(paeText);}catch(e){paeError="Found PAE gid="+paeGid+" but the fetch failed: "+(e.message||e);}}
-  return{ceRows,agrRows,agrError,pae,paeError};}
+async function loadFromPublicCSV(){
+  // Helper to fetch a tab CSV by hardcoded gid
+  const fetchCSV = async (gid, label) => {
+    const url = PUB_BASE+"?output=csv&gid="+gid+"&_="+Date.now();
+    const resp = await fetch(url, { method:"GET", cache:"no-store", redirect:"follow" });
+    if (!resp.ok) throw new Error(label+" HTTP "+resp.status+" "+resp.statusText);
+    const text = await resp.text();
+    if (!text || text.length < 50) throw new Error(label+" CSV came back empty.");
+    return text;
+  };
+  // 1) Privyr CE tab
+  const ceText = await fetchCSV(SHEET_GID, "Privyr CE");
+  const ceRows = parsePrivyrFromCSV(ceText);
+  // 2) Ad Generated Revenue tab
+  let agrRows = [], agrError = null;
+  try { agrRows = parseAGRFromCSV(await fetchCSV(AGR_GID, "AGR")); }
+  catch (e) { agrError = "AGR fetch failed: " + (e.message || e); }
+  // 3) Platform Ad Efficiency_Mktg tab
+  let pae = null, paeError = null;
+  try { pae = parsePAEFromCSV(await fetchCSV(PAE_GID, "PAE")); }
+  catch (e) { paeError = "PAE fetch failed: " + (e.message || e); }
+  return { ceRows, agrRows, agrError, pae, paeError };
+}
 
 async function load(){setStamp();const inCowork=!!(window.cowork&&typeof window.cowork.callMcpTool==="function");let bundle;try{bundle=inCowork?await loadFromCowork():await loadFromPublicCSV();}catch(err){const msg=err&&err.message?err.message:String(err);if(inCowork){showError("Couldn't load via Cowork's Drive MCP",msg);}else{showError("Couldn't fetch the published CSV",msg+"\n\nIf this is a CORS/network error in a file:// page, try a tiny local server:\n  python -m http.server 8000\nand open http://localhost:8000/privyr-creative-effectiveness.html\n\nAlso confirm the workbook is still set to File → Share → Publish to web,\nand that gid="+SHEET_GID+" is the Privyr CE tab.");}return;}const{ceRows,agrRows,agrError,pae,paeError}=bundle;if(!ceRows.length){showError("No active rows found",'The Privyr CE tab returned 0 rows where column F = "active".');return;}const agrMap=buildAGRMap(agrRows);mergeAGRIntoCE(ceRows,agrMap);state.rows=ceRows;state.totals=privyrTotals(agrRows);state.pae=pae||null;if(agrError){showError("Orders / Revenue (per-ad) not loaded",agrError+"\n\nFix: open the workbook → click the \"Ad Generated Revenue\" tab → look at the URL — the number after gid= is the value we need.","warn");}if(paeError){showError("Top-card period totals not loaded",paeError+"\n\nFix: open the workbook → click the \"Platform Ad Efficiency_Mktg\" tab → copy the number after gid= from the URL and send it to me.","warn");}renderTable();}
 
