@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Privyr · Creative Effectiveness — Instant Form Leads</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg:#faf8f5;--panel:#fff;--ink:#1f2421;--ink-soft:#57615b;--ink-muted:#8a938d;
+    --line:#e8e3da;--line-soft:#f1ede5;
+    --sage:#6f8a72;--sage-bg:#e8efe3;--sage-ink:#3d5440;
+    --rose:#b86a6a;--rose-bg:#f4e2e2;--rose-ink:#7a3a3a;
+    --neutral:#6b7280;--neutral-bg:#eef0ee;
+    --accent:#2f4a3a;--accent-soft:#4a6b56;
+    --amber-bg:#f6ecd6;--amber-ink:#7a5a23;
+    --shadow:0 1px 2px rgba(20,30,25,0.04),0 4px 16px rgba(20,30,25,0.04);
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink)}
+  body{font-family:ui-sans-serif,-apple-system,"Segoe UI","Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1320px;margin:0 auto;padding:24px 20px 56px}
+  header.top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
+  .brand h1{margin:0 0 4px;font-size:22px;font-weight:600;letter-spacing:-0.01em;color:var(--ink)}
+  .brand .sub{color:var(--ink-soft);font-size:13px}
+  .brand .badge{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--sage-bg);color:var(--sage-ink);font-size:11px;font-weight:600;letter-spacing:.02em;vertical-align:middle}
+  .meta{text-align:right;color:var(--ink-muted);font-size:12px}
+  .meta .stamp{color:var(--ink-soft)}
+  .grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;margin-bottom:22px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 14px 12px;box-shadow:var(--shadow)}
+  .card .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#6f2da8;margin-bottom:6px;font-weight:700}
+  .card .val{font-size:22px;font-weight:600;color:var(--ink);letter-spacing:-0.01em;line-height:1.1}
+  .card .hint{font-size:11px;color:#6f2da8;margin-top:4px;opacity:.78}
+  .card.multi .multi-rows{display:flex;flex-direction:column;gap:3px;margin-top:2px}
+  .card.multi .multi-rows .r{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+  .card.multi .ptag{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);font-weight:600}
+  .card.multi .pval{font-size:15px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-0.005em}
+  /* Grouped cards: multiple metrics × 3 periods inside one card */
+  .card.group .group-grid{display:grid;grid-template-columns:1fr auto auto auto;column-gap:14px;row-gap:6px;margin-top:8px;align-items:baseline}
+  .card.group .gh{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-muted);font-weight:600;text-align:right;border-bottom:1px dashed var(--line-soft);padding-bottom:4px}
+  .card.group .gh.first{text-align:left;border-bottom:1px dashed var(--line-soft)}
+  .card.group .gm{font-size:12px;color:var(--ink-soft);font-weight:500;white-space:nowrap}
+  .card.group .gv{font-size:14px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+  .card.group .gv.muted{color:var(--ink-muted);font-weight:500}
+  .card.solo{display:flex;flex-direction:column;justify-content:center}
+  .card.solo .val{font-size:32px;line-height:1.1;margin-top:2px}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+  .chip{border:1px solid var(--line);background:var(--panel);color:var(--ink-soft);padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;cursor:pointer;user-select:none;transition:all 120ms ease}
+  .chip:hover{border-color:var(--accent-soft);color:var(--ink)}
+  .chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .chip .count{margin-left:6px;opacity:.7;font-variant-numeric:tabular-nums}
+  .table-wrap{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  table.dt{width:100%;border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums}
+  table.dt thead th{text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted);padding:12px 14px;background:var(--line-soft);border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;z-index:5;box-shadow:0 1px 0 var(--line)}
+  /* Top-left corner cell: sticky in BOTH directions, must sit above other sticky cells */
+  table.dt thead th:first-child{border-top-left-radius:var(--radius);left:0;z-index:7;box-shadow:1px 1px 0 var(--line)}
+  table.dt thead th:last-child{border-top-right-radius:var(--radius)}
+  table.dt tbody tr:last-child td:first-child{border-bottom-left-radius:var(--radius)}
+  table.dt tbody tr:last-child td:last-child{border-bottom-right-radius:var(--radius)}
+  table.dt thead th.sortable{cursor:pointer;user-select:none}
+  table.dt thead th .arrow{opacity:.5;margin-left:4px;font-size:10px}
+  table.dt thead th.active .arrow{opacity:1;color:var(--accent)}
+  table.dt tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;background:var(--panel)}
+  /* Subtle, consistent separators between metric rows */
+  tr.row-life td,tr.row-l30 td{border-bottom:1px dashed var(--line-soft)}
+  tr.row-l7 td{border-bottom:1px solid var(--line-soft)}
+  /* Block separation */
+  tr.block-end td{border-bottom:1px solid var(--line)}
+  tr.block-start td.ad-name{border-top:1px solid var(--line)}
+  /* Period rows all share the same panel background so the rowspan cells blend in */
+  /* Info rows: very subtle differentiation */
+  tr.row-learn td{background:#fbf8f1;border-bottom:1px dashed var(--line-soft)}
+  tr.row-budget td{background:#f7f9f4}
+  /* Sticky-left Ad Name column — keeps the ad row label visible while scrolling horizontally.
+     z-index sits below the sticky thead (5) but above other body cells (default 0).
+     Solid background + right shadow so scrolling cells don't bleed through. */
+  td.ad-name{font-weight:500;color:var(--ink);max-width:320px;min-width:240px;word-break:break-word;vertical-align:top;padding-top:14px;border-right:1px solid var(--line-soft);position:sticky;left:0;z-index:3;background:var(--panel);box-shadow:1px 0 0 var(--line-soft)}
+  td.ad-name .row-num{font-size:11px;color:var(--ink-muted);margin-bottom:4px;font-weight:500}
+  td.period{font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;color:var(--ink-muted);white-space:nowrap;width:110px}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  th.num{text-align:right}
+  /* Rowspan'd Orders / Revenue cells: clean neutral block, vertically centered */
+  td.span-cell{vertical-align:middle;border-left:1px solid var(--line-soft);font-weight:600;color:var(--ink);font-size:14px}
+  td.span-cell.muted{color:var(--ink-muted);font-weight:500}
+  .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;border:1px solid transparent}
+  .pill.sage{background:var(--sage-bg);color:var(--sage-ink)}
+  .pill.rose{background:var(--rose-bg);color:var(--rose-ink)}
+  .pill.amber{background:var(--amber-bg);color:var(--amber-ink)}
+  .pill.neutral{background:var(--neutral-bg);color:var(--ink-soft)}
+  .info-row td.info{padding:10px 14px;font-size:12.5px;color:var(--ink-soft)}
+  .info-row .lbl{display:inline-block;min-width:162px;font-weight:600;color:var(--ink);margin-right:8px;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+  .info-row .detail{color:var(--ink-soft)}
+  .info-row .strong{color:var(--ink);font-weight:600}
+  .empty,.loading{padding:32px 24px;text-align:center;color:var(--ink-muted)}
+  .loading .spinner{display:inline-block;width:16px;height:16px;margin-right:8px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin 700ms linear infinite;vertical-align:-3px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .error{color:var(--rose-ink);background:var(--rose-bg);border-radius:var(--radius);text-align:left;margin-bottom:16px;padding:14px 16px}
+  .error.warn{background:var(--amber-bg);color:var(--amber-ink)}
+  .error .ttl{font-weight:600;margin-bottom:4px}
+  .error pre{margin:8px 0 0;white-space:pre-wrap;word-break:break-word;font-size:12px;color:var(--ink-soft);background:rgba(255,255,255,.5);padding:8px;border-radius:6px;max-height:220px;overflow:auto}
+  .footnote{margin-top:14px;font-size:11px;color:var(--ink-muted)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:var(--ink-muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend .sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .legend .sw.sage{background:var(--sage)}
+  .legend .sw.rose{background:var(--rose)}
+  .legend .sw.amber{background:#c69b4a}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Privyr · Creative Effectiveness <span class="badge">Instant Form Leads</span></h1>
+      <div class="sub">D'Moksha · India Meta Campaigns Weekly Tracker</div>
+    </div>
+    <div class="meta">
+      <div id="stamp" class="stamp">—</div>
+      <div>Currency: INR</div>
+    </div>
+  </header>
+      <section id="cards" class="grid-cards" aria-label="Summary">
+    <div class="card solo"><div class="lbl">Active Ads</div><div class="val" id="m-active">—</div><div class="hint">column F = active</div></div>
+    <div class="card group">
+      <div class="lbl">Spend + Efficiency</div>
+      <div class="hint">Spend · CPL · CPVL</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">Spend</div>
+      <div class="gv" id="m-spend-life">—</div>
+      <div class="gv" id="m-spend-l30">—</div>
+      <div class="gv" id="m-spend-l7">—</div>
+      <div class="gm">CPL</div>
+      <div class="gv" id="m-cpl-life">—</div>
+      <div class="gv" id="m-cpl-l30">—</div>
+      <div class="gv" id="m-cpl-l7">—</div>
+      <div class="gm">CPVL</div>
+      <div class="gv" id="m-cpvl-life">—</div>
+      <div class="gv" id="m-cpvl-l30">—</div>
+      <div class="gv" id="m-cpvl-l7">—</div>
+      </div>
+    </div>
+    <div class="card group">
+      <div class="lbl">Lead Quality</div>
+      <div class="hint">Leads · Valid · Conversion</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">Total Leads</div>
+      <div class="gv" id="m-leads-life">—</div>
+      <div class="gv" id="m-leads-l30">—</div>
+      <div class="gv" id="m-leads-l7">—</div>
+      <div class="gm">Valid Leads</div>
+      <div class="gv" id="m-valid-life">—</div>
+      <div class="gv" id="m-valid-l30">—</div>
+      <div class="gv" id="m-valid-l7">—</div>
+      <div class="gm">Lead → Valid %</div>
+      <div class="gv" id="m-l2v-life">—</div>
+      <div class="gv" id="m-l2v-l30">—</div>
+      <div class="gv" id="m-l2v-l7">—</div>
+      </div>
+    </div>
+    <div class="card group">
+      <div class="lbl">Brief Funnel</div>
+      <div class="hint">Brief Taken · Cost · Conversion</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">Brief Taken</div>
+      <div class="gv" id="m-bt-life">—</div>
+      <div class="gv" id="m-bt-l30">—</div>
+      <div class="gv" id="m-bt-l7">—</div>
+      <div class="gm">CPBT</div>
+      <div class="gv" id="m-cpbt-life">—</div>
+      <div class="gv" id="m-cpbt-l30">—</div>
+      <div class="gv" id="m-cpbt-l7">—</div>
+      <div class="gm">Valid → Brief %</div>
+      <div class="gv" id="m-v2b-life">—</div>
+      <div class="gv" id="m-v2b-l30">—</div>
+      <div class="gv" id="m-v2b-l7">—</div>
+      </div>
+    </div>
+    <div class="card group">
+      <div class="lbl">Home Visit Funnel</div>
+      <div class="hint">Home Visits · Cost · Conversion</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">Home Visits</div>
+      <div class="gv" id="m-hv-life">—</div>
+      <div class="gv" id="m-hv-l30">—</div>
+      <div class="gv" id="m-hv-l7">—</div>
+      <div class="gm">CPHV</div>
+      <div class="gv" id="m-cphv-life">—</div>
+      <div class="gv" id="m-cphv-l30">—</div>
+      <div class="gv" id="m-cphv-l7">—</div>
+      <div class="gm">Brief → Visit %</div>
+      <div class="gv" id="m-b2h-life">—</div>
+      <div class="gv" id="m-b2h-l30">—</div>
+      <div class="gv" id="m-b2h-l7">—</div>
+      </div>
+    </div>
+    <div class="card group">
+      <div class="lbl">Orders Funnel</div>
+      <div class="hint">Orders · stage conversions</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">Orders</div>
+      <div class="gv" id="m-orders-life">—</div>
+      <div class="gv" id="m-orders-l30">—</div>
+      <div class="gv" id="m-orders-l7">—</div>
+      <div class="gm">Lead → Order %</div>
+      <div class="gv" id="m-l2o-life">—</div>
+      <div class="gv" id="m-l2o-l30">—</div>
+      <div class="gv" id="m-l2o-l7">—</div>
+      <div class="gm">Valid → Order %</div>
+      <div class="gv" id="m-v2o-life">—</div>
+      <div class="gv" id="m-v2o-l30">—</div>
+      <div class="gv" id="m-v2o-l7">—</div>
+      <div class="gm">Visit → Order %</div>
+      <div class="gv" id="m-h2o-life">—</div>
+      <div class="gv" id="m-h2o-l30">—</div>
+      <div class="gv" id="m-h2o-l7">—</div>
+      </div>
+    </div>
+    <div class="card group">
+      <div class="lbl">Revenue Block</div>
+      <div class="hint">Revenue · AOV</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">Revenue</div>
+      <div class="gv" id="m-revenue-life">—</div>
+      <div class="gv" id="m-revenue-l30">—</div>
+      <div class="gv" id="m-revenue-l7">—</div>
+      <div class="gm">Avg Order Value</div>
+      <div class="gv" id="m-aov-life">—</div>
+      <div class="gv" id="m-aov-l30">—</div>
+      <div class="gv" id="m-aov-l7">—</div>
+      </div>
+    </div>
+    <div class="card group">
+      <div class="lbl">Profitability</div>
+      <div class="hint">CAC · ROAS</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">CAC</div>
+      <div class="gv" id="m-cac-life">—</div>
+      <div class="gv" id="m-cac-l30">—</div>
+      <div class="gv" id="m-cac-l7">—</div>
+      <div class="gm">ROAS</div>
+      <div class="gv" id="m-roas-life">—</div>
+      <div class="gv" id="m-roas-l30">—</div>
+      <div class="gv" id="m-roas-l7">—</div>
+      </div>
+    </div>
+  </section>
+  <div class="toolbar" id="chips" role="tablist" aria-label="Filter">
+    <button class="chip active" data-filter="all">All active <span class="count" id="c-all">0</span></button>
+    <button class="chip" data-filter="under">Underperforming (CPL &gt; ₹150 and CTR &lt; 1%) <span class="count" id="c-under">0</span></button>
+    <button class="chip" data-filter="top">Top performers (CPL ≤ ₹150 AND CTR ≥ 1%) <span class="count" id="c-top">0</span></button>
+  </div>
+  <div id="err"></div>
+  <div class="table-wrap" id="table-wrap">
+    <div id="loader" class="loading"><span class="spinner"></span>Loading live <code>Creative Effectiveness_Privyr</code>…</div>
+    <table class="dt" id="dt" style="display:none">
+      <thead>
+        <tr>
+          <th class="sortable" data-sort="ad_name">Ad Name <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="spend">Spend (₹) <span class="arrow">↕</span></th>
+          <th>Period</th>
+          <th class="num sortable" data-sort="ctr">CTR <span class="arrow">↕</span></th>
+          <th class="num sortable active" data-sort="cpl">CPL <span class="arrow">↑</span></th>
+          <th class="num sortable" data-sort="leads">Leads <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="valid_leads">Valid Leads <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="valid_pct">Valid % <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="nr_leads">NR Leads <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="cpvl">CPVL <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="orders">Orders <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="revenue">Revenue <span class="arrow">↕</span></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <div class="legend">
+    <span><i class="sw sage"></i> within target</span>
+    <span><i class="sw rose"></i> outside target</span>
+    <span><i class="sw amber"></i> learning</span>
+    <span>· CTR ≥ 1%, CPL ≤ ₹150 · Sort by Lifetime · Meta Learning uses L7 leads vs 50/wk</span>
+  </div>
+  <div class="footnote">
+    Recommended Budget = 50 × L30 CPL (falls back to Lifetime CPL when L30 has no leads). Daily ≈ weekly ÷ 7. Orders &amp; Revenue per ad are matched from "Ad Generated Revenue" via the Helper Column. AOV = Total Revenue ÷ Total Orders. ROAS = Total Revenue ÷ Active-ads Lifetime Spend.
+  </div>
+</div>
+<script>
+(()=>{"use strict";
+const STORAGE_KEY="privyr-creative-effectiveness:v7";
+const FILE_ID="1vE4GY-6l2YIBz5rWy6uKvHc8ReuFwBgS";
+const DRIVE_TOOL="mcp__66fa5073-4346-419f-88aa-c11cfb492155__read_file_content";
+const PUB_BASE="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDP0_BGmMv5wOX8VsPgLQ2EUkcRnYZOrl-4X0jAhFVAHkSGTh2Jx1ltQ671ALGOA/pub";
+const PUBHTML_URL=PUB_BASE+"html";
+const SHEET_GID="1292439970";
+const CSV_URL=PUB_BASE+"?output=csv&gid="+SHEET_GID;
+const AGR_TAB_NAME="Ad Generated Revenue";
+const PAE_TAB_NAME="Platform Ad Efficiency_Mktg";
+const META_LEARNING_THRESHOLD=50;
+
+const fmtINR0=n=>(n==null||isNaN(n))?"—":"₹"+Math.round(n).toLocaleString("en-IN");
+const fmtPct=n=>(n==null||isNaN(n))?"—":Number(n).toFixed(2)+"%";
+const fmtInt=n=>(n==null||isNaN(n))?"—":Math.round(Number(n)).toLocaleString("en-IN");
+const fmtMult=n=>(n==null||isNaN(n))?"—":Number(n).toFixed(2)+"x";
+const el=id=>document.getElementById(id);
+const escapeHtml=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+
+function setStamp(){const d=new Date();el("stamp").textContent="Loaded "+d.toLocaleString("en-IN",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});}
+function showError(title,detail,klass){const div=document.createElement("div");div.className="error"+(klass?" "+klass:"");const t=document.createElement("div");t.className="ttl";t.textContent=title;div.appendChild(t);if(detail){const p=document.createElement("pre");p.textContent=typeof detail==="string"?detail:JSON.stringify(detail,null,2);div.appendChild(p);}el("err").appendChild(div);el("loader").style.display="none";}
+
+function extractFileContent(resp){const texts=[];const pushText=s=>{if(typeof s==="string"&&s.length)texts.push(s);};function walk(node){if(node==null)return;if(typeof node==="string"){pushText(node);return;}if(Array.isArray(node)){node.forEach(walk);return;}if(typeof node==="object"){if(node.type==="mcp_tool_result"){if(Array.isArray(node.content))node.content.forEach(walk);else walk(node.content);}else if(node.type==="text"&&typeof node.text==="string"){pushText(node.text);}if(Array.isArray(node.content))node.content.forEach(walk);if(typeof node.text==="string"&&node.type!=="text")pushText(node.text);if(typeof node.fileContent==="string")pushText(node.fileContent);if(typeof node.result==="string")pushText(node.result);}}walk(resp);for(const t of texts){const trimmed=t.trim();if(trimmed.startsWith("{")){try{const obj=JSON.parse(trimmed);if(obj&&typeof obj.fileContent==="string")return obj.fileContent;}catch(e){}}}texts.sort((a,b)=>b.length-a.length);return texts[0]||"";}
+
+function parseCsvRow(text){const out=[];let cur="",inQ=false;for(let i=0;i<text.length;i++){const c=text[i];if(inQ){if(c==='"'){if(text[i+1]==='"'){cur+='"';i++;}else inQ=false;}else cur+=c;}else{if(c==='"')inQ=true;else if(c===','){out.push(cur);cur="";}else cur+=c;}}out.push(cur);return out;}
+
+function parseCSV(text){const rows=[];let row=[],cur="",inQ=false,i=0;while(i<text.length){const c=text[i];if(inQ){if(c==='"'){if(text[i+1]==='"'){cur+='"';i+=2;continue;}inQ=false;i++;}else{cur+=c;i++;}}else{if(c==='"'){inQ=true;i++;}else if(c===','){row.push(cur);cur="";i++;}else if(c==='\r'){i++;}else if(c==='\n'){row.push(cur);rows.push(row);row=[];cur="";i++;}else{cur+=c;i++;}}}if(cur.length||row.length){row.push(cur);rows.push(row);}return rows;}
+
+const num=v=>{if(v==null)return null;const s=String(v).replace(/[₹\s,]/g,"").replace(/%$/,"");if(s===""||s==="-"||s.toLowerCase()==="n/a")return null;const n=Number(s);return isNaN(n)?null:n;};
+const cleanName=s=>String(s||"").replace(/\\_/g,"_").trim();
+const normHelperKey=s=>String(s||"").replace(/\\_/g,"_").replace(/\s+/g," ").trim().toLowerCase();
+
+function readPeriod(cols,off){const ctr=num(cols[off.ctr]);const spend=num(cols[off.spend]);const cpl=num(cols[off.cpl]);const leads=num(cols[off.leads]);const validLeads=num(cols[off.valid]);let validPct=num(cols[off.valid_pct]);if((validPct==null||isNaN(validPct))&&leads&&leads>0&&validLeads!=null){validPct=(validLeads/leads)*100;}let cpvl=num(cols[off.cpvl]);if((cpvl==null||isNaN(cpvl))&&spend!=null&&validLeads&&validLeads>0){cpvl=spend/validLeads;}return{spend,ctr,cpc:num(cols[off.cpc]),cpl,leads,valid_leads:validLeads,valid_pct:validPct,nr_leads:num(cols[off.nr]),cpvl};}
+
+const OFFSETS={lifetime:{spend:7,ctr:10,cpc:11,leads:13,valid:14,valid_pct:15,nr:16,cpl:17,cpvl:18},l30:{spend:22,ctr:25,cpc:26,leads:28,valid:29,valid_pct:30,nr:31,cpl:32,cpvl:33},l7:{spend:37,ctr:40,cpc:41,leads:43,valid:44,valid_pct:45,nr:46,cpl:47,cpvl:48}};
+
+function parsePrivyrFromCSV(csvText){const all=parseCSV(csvText);if(!all.length)throw new Error("CSV is empty.");const looksNumeric=v=>v!=null&&/\d/.test(String(v));const rows=[];let scanned=0;for(let i=0;i<all.length;i++){const cols=all[i];if(!cols)continue;scanned++;if(cols.length<19)continue;const status=(cols[5]||"").trim().toLowerCase();if(status!=="active")continue;const ad=(cols[3]||"").trim();if(!ad||ad.length<2)continue;if(!looksNumeric(cols[7]))continue;rows.push({ad_name:cleanName(cols[3]),campaign:cleanName(cols[1]),helper_key:normHelperKey(cols[6]),lifetime:readPeriod(cols,OFFSETS.lifetime),l30:readPeriod(cols,OFFSETS.l30),l7:readPeriod(cols,OFFSETS.l7),orders:null,revenue:null});}if(!rows.length){const preview=all.slice(0,12).map((r,i)=>"  row "+(i+1).toString().padStart(2)+" ["+(r?r.length:0)+"c]: "+(r||[]).slice(0,7).map(c=>JSON.stringify(c||"")).join(", ")).join("\n");throw new Error('Found 0 rows where col F = "active" ('+scanned+' scanned).\n'+preview);}return rows;}
+
+function parsePrivyrFromNL(content){const headerRe=/Date Range,Campaign name,Ad set name/g;const heads=[];let m;while((m=headerRe.exec(content))!==null)heads.push(m.index);if(heads.length<3){throw new Error("Privyr CE tab not found (need ≥3 'Date Range' headers, got "+heads.length+").");}const start=heads[2];const section=content.slice(start);const rowParts=section.split(/(?=1st [A-Z][a-z]+ \d{4} - \d+(?:st|nd|rd|th) [A-Z][a-z]+ \d{4},)/);const rows=[];for(let i=1;i<rowParts.length;i++){let piece=rowParts[i];if(/Date Range,Campaign name/.test(piece)){const cut=piece.search(/Date Range,Campaign name/);if(cut>0)piece=piece.slice(0,cut);else continue;}const cols=parseCsvRow(piece);if(cols.length<49)continue;const status=(cols[5]||"").trim().toLowerCase();if(status!=="active")continue;rows.push({ad_name:cleanName(cols[3]),campaign:cleanName(cols[1]),helper_key:normHelperKey(cols[6]),lifetime:readPeriod(cols,OFFSETS.lifetime),l30:readPeriod(cols,OFFSETS.l30),l7:readPeriod(cols,OFFSETS.l7),orders:null,revenue:null});}return rows.filter(r=>r.ad_name&&r.ad_name.length>1);}
+
+function parseAGRFromCSV(csvText){const all=parseCSV(csvText);const out=[];for(const cols of all){if(!cols||cols.length<8)continue;const platform=(cols[0]||"").trim();if(!platform||/^platform$/i.test(platform))continue;const orders=num(cols[6]);const revenue=num(cols[7]);if(orders==null&&revenue==null)continue;out.push({platform,helper_key:normHelperKey(cols[4]),orders:orders||0,revenue:revenue||0});}return out;}
+
+function parseAGRFromNL(content){const tabStart=content.indexOf("Ad Generated Revenue ");if(tabStart<0)return[];const stops=[content.indexOf("Notes",tabStart+100),content.indexOf("Insights",tabStart+100),content.indexOf("Lead Performance",tabStart+100),content.indexOf("Conversion Outcomes",tabStart+100)].filter(x=>x>0);const hardStop=stops.length?Math.min.apply(null,stops):tabStart+25000;const section=content.slice(tabStart,hardStop);const parts=section.split(/(?= (?:Privyr|DoubleTick|Brevo|TOTAL|Total|WhatsApp|SMS|Aggregator|Other),)/i);const out=[];for(const p of parts){const cols=parseCsvRow(p.trim());if(cols.length<8)continue;const platform=(cols[0]||"").trim();if(!platform||/^platform$/i.test(platform))continue;const orders=num(cols[6]);const revenue=num(cols[7]);if(orders==null&&revenue==null)continue;out.push({platform,helper_key:normHelperKey(cols[4]),orders:orders||0,revenue:revenue||0});}return out;}
+
+function buildAGRMap(agrRows){const m=new Map();for(const r of agrRows){if(!r.helper_key)continue;const prev=m.get(r.helper_key);if(prev)m.set(r.helper_key,{orders:prev.orders+r.orders,revenue:prev.revenue+r.revenue});else m.set(r.helper_key,{orders:r.orders,revenue:r.revenue});}return m;}
+
+function privyrTotals(agrRows){let orders=0,revenue=0,count=0;for(const r of agrRows){if(r.platform.toLowerCase()!=="privyr")continue;orders+=Number(r.orders)||0;revenue+=Number(r.revenue)||0;count++;}return{orders,revenue,rowCount:count};}
+
+function mergeAGRIntoCE(ceRows,agrMap){for(const r of ceRows){const hit=agrMap.get(r.helper_key);if(hit){r.orders=hit.orders;r.revenue=hit.revenue;}}}
+
+// === Platform Ad Efficiency_Mktg parsers ===
+// Tab layout (after the "Metric,DoubleTick,Privyr,Website ECF,..." header row):
+//   col 0 = metric name, cols 1-3 = LIFETIME (DT, Privyr, ECF),
+//   cols 4-6 = L30 (DT, Privyr, ECF), cols 7-9 = L7 (DT, Privyr, ECF).
+// We pull only the Privyr columns: 2 (Lifetime), 5 (L30), 8 (L7).
+const PAE_LABEL_KEY={
+  "spend":["Spend","Spend (₹)"],
+  "leads":["Leads"],
+  "cpl":["CPL","CPL (₹)"],
+  "valid":["Valid Leads"],
+  "cpvl":["CPVL","CPVL (₹)"],
+  "l2v":["Lead → Valid Lead %","Lead -> Valid Lead %"],
+  "bt":["Brief Taken"],
+  "cpbt":["CPBT","CPBT (₹)"],
+  "v2b":["Valid Lead → Brief Taken %","Valid Lead -> Brief Taken %"],
+  "hv":["Home Visits"],
+  "cphv":["CPHV","CPHV (₹)"],
+  "b2h":["Brief Taken → Home Visit %","Brief Taken -> Home Visit %"],
+  "orders":["Orders"],
+  "revenue":["Revenue","Revenue (₹)"],
+  "aov":["AOV","AOV (₹)"],
+  "cac":["CAC","CAC (₹)"],
+  "roas":["ROAS","ROAS (x)"],
+  "h2o":["Home Visits → Order %","Home Visits -> Order %"],
+  "v2o":["Valid Lead → Order %","Valid Lead -> Order %"]
+};
+function paeNorm(s){return String(s||"").replace(/\\_/g,"_").replace(/\s+/g," ").trim();}
+function buildPAEResult(metricByLabel){
+  const out={};
+  for(const key in PAE_LABEL_KEY){
+    const aliases=PAE_LABEL_KEY[key];
+    let row=null;
+    for(const a of aliases){if(metricByLabel[a]){row=metricByLabel[a];break;}}
+    if(!row){
+      // Loose match: try labels that start with the alias
+      for(const a of aliases){
+        for(const k in metricByLabel){if(k.toLowerCase().startsWith(a.toLowerCase())){row=metricByLabel[k];break;}}
+        if(row)break;
+      }
+    }
+    if(!row){out[key]=null;continue;}
+    out[key]={lifetime:num(row[2]),l30:num(row[5]),l7:num(row[8])};
+  }
+  return out;
+}
+function parsePAEFromCSV(csvText){
+  const all=parseCSV(csvText);
+  const map={};
+  for(const cols of all){
+    if(!cols||cols.length<10)continue;
+    const lbl=paeNorm(cols[0]);
+    if(!lbl||/^metric$/i.test(lbl))continue;
+    map[lbl]=cols;
+  }
+  return buildPAEResult(map);
+}
+function parsePAEFromNL(content){
+  const tabStart=content.indexOf("Platform Ad Efficiency");
+  if(tabStart<0)return null;
+  const headerIdx=content.indexOf("Metric,DoubleTick,Privyr,Website ECF",tabStart);
+  if(headerIdx<0)return null;
+  // Tab body ends when the next tab marker appears. Conservative bounds.
+  const stops=[
+    content.indexOf("Ad Efficiency\\_Mktg ",headerIdx+50),
+    content.indexOf("Ad Efficiency_Mktg ",headerIdx+50),
+    content.indexOf("Ad Generated Revenue",headerIdx+50)
+  ].filter(x=>x>0);
+  const tabEnd=stops.length?Math.min.apply(null,stops):headerIdx+8000;
+  // Skip past the FULL header line. The header ends with "...Website ECF "
+  // (the third "Website ECF" — for the L7 period — followed by a space before
+  // the first data row). Searching for "ECF " from the header position lands
+  // on a space inside "Website ECF" too early, so search forward for the last
+  // "Website ECF " before the data starts.
+  let bodyStart=headerIdx+"Metric,DoubleTick,Privyr,Website ECF".length;
+  // Walk forward past any further ",DoubleTick,Privyr,Website ECF" repetitions
+  while(content.startsWith(",DoubleTick,Privyr,Website ECF",bodyStart)){
+    bodyStart += ",DoubleTick,Privyr,Website ECF".length;
+  }
+  const body=content.slice(bodyStart,tabEnd);
+  // Row separator: a closing field char (",|digit|%|)) followed by whitespace
+  // followed by a capital letter that begins a new metric label.
+  const parts=body.split(/(?<=[")\d%])\s+(?=[A-Z])/);
+  const map={};
+  for(const p of parts){
+    const cols=parseCsvRow(p.trim());
+    if(cols.length<10)continue;
+    const lbl=paeNorm(cols[0]);
+    if(!lbl)continue;
+    map[lbl]=cols;
+  }
+  return buildPAEResult(map);
+}
+
+const state={rows:[],totals:{orders:null,revenue:null,rowCount:0},pae:null,filter:localStorage.getItem(STORAGE_KEY+":filter")||"all",sort:JSON.parse(localStorage.getItem(STORAGE_KEY+":sort")||'{"key":"cpl","dir":"asc"}')};
+
+const isUnder=r=>(r.lifetime.cpl!=null&&r.lifetime.cpl>150)||(r.lifetime.ctr!=null&&r.lifetime.ctr<1);
+const isTop=r=>(r.lifetime.cpl!=null&&r.lifetime.cpl<=150)&&(r.lifetime.ctr!=null&&r.lifetime.ctr>=1);
+const applyFilter=(rows,f)=>f==="under"?rows.filter(isUnder):f==="top"?rows.filter(isTop):rows.slice();
+
+function sortRows(rows,key,dir){const mul=dir==="asc"?1:-1;const topLevel=key==="orders"||key==="revenue";return rows.slice().sort((a,b)=>{const va=key==="ad_name"?a.ad_name:topLevel?a[key]:a.lifetime[key];const vb=key==="ad_name"?b.ad_name:topLevel?b[key]:b.lifetime[key];if(key==="ad_name")return String(va).localeCompare(String(vb))*mul;const an=va==null||isNaN(va)?Infinity:Number(va);const bn=vb==null||isNaN(vb)?Infinity:Number(vb);if(an===bn)return 0;return(an<bn?-1:1)*mul;});}
+
+function pill(value,kind,formatter){if(value==null||isNaN(value))return '<span class="pill neutral">—</span>';return '<span class="pill '+kind+'">'+formatter(value)+'</span>';}
+const ctrPill=v=>pill(v,(v!=null&&v>=1)?"sage":(v==null?"neutral":"rose"),fmtPct);
+const cplPill=v=>pill(v,(v!=null&&v<=150)?"sage":(v==null?"neutral":"rose"),fmtINR0);
+
+function metaLearning(r){const wkLeads=r.l7.leads;if(wkLeads==null){return{html:'<span class="pill neutral">No L7 data</span>',detail:"Last 7 days has no recorded leads — cannot evaluate."};}const passed=wkLeads>=META_LEARNING_THRESHOLD;const tag=passed?'<span class="pill sage">Passed</span>':'<span class="pill amber">Learning</span>';const gap=Math.max(0,META_LEARNING_THRESHOLD-wkLeads);const detail=passed?'<span class="strong">'+fmtInt(wkLeads)+'</span> leads in last 7 days · already past Meta\'s '+META_LEARNING_THRESHOLD+'/wk threshold.':'<span class="strong">'+fmtInt(wkLeads)+'</span> leads in last 7 days · <span class="strong">'+fmtInt(gap)+'</span> more needed to exit Learning.';return{html:tag,detail};}
+
+function recommendedBudget(r){let cpl=r.l30.cpl,basis="Last 30 days";if(cpl==null||isNaN(cpl)||cpl<=0){cpl=r.lifetime.cpl;basis="Lifetime (L30 had no leads)";}if(cpl==null||isNaN(cpl)||cpl<=0){return{html:'<span class="pill neutral">—</span>',detail:"No CPL available to compute a recommendation."};}const weekly=META_LEARNING_THRESHOLD*cpl;const daily=weekly/7;const tag='<span class="pill neutral">'+fmtINR0(weekly)+'/wk</span>';const detail='<span class="strong">'+fmtINR0(weekly)+'/wk</span> &nbsp;·&nbsp; <span class="strong">'+fmtINR0(daily)+'/day</span> &nbsp;to hit '+META_LEARNING_THRESHOLD+' leads/week at '+basis+' CPL <span class="strong">'+fmtINR0(cpl)+'</span>.';return{html:tag,detail};}
+
+function renderCards(all){
+  el("m-active").textContent=all.length.toLocaleString("en-IN");
+  const periods=["lifetime","l30","l7"];
+  const periodIds={lifetime:"life",l30:"l30",l7:"l7"};
+  const pae=state.pae||{};
+  // Derived: Lead → Order % per period (Orders / Leads × 100)
+  const ordersObj=pae.orders||null, leadsObj=pae.leads||null;
+  const l2o=(ordersObj&&leadsObj)?{
+    lifetime:(leadsObj.lifetime>0)?(ordersObj.lifetime/leadsObj.lifetime)*100:null,
+    l30:(leadsObj.l30>0)?(ordersObj.l30/leadsObj.l30)*100:null,
+    l7:(leadsObj.l7>0)?(ordersObj.l7/leadsObj.l7)*100:null
+  }:null;
+  const setMulti=(idBase,paeKey,fmt,override)=>{
+    const obj=override||(paeKey?pae[paeKey]:null);
+    for(const p of periods){
+      const v=obj?obj[p]:null;
+      const node=el(idBase+"-"+periodIds[p]);
+      if(node){node.textContent=fmt(v);node.classList.toggle("muted",v==null||isNaN(v));}
+    }
+  };
+  setMulti("m-spend","spend",fmtINR0);
+  setMulti("m-cpl","cpl",fmtINR0);
+  setMulti("m-cpvl","cpvl",fmtINR0);
+  setMulti("m-leads","leads",fmtInt);
+  setMulti("m-valid","valid",fmtInt);
+  setMulti("m-l2v","l2v",fmtPct);
+  setMulti("m-bt","bt",fmtInt);
+  setMulti("m-cpbt","cpbt",fmtINR0);
+  setMulti("m-v2b","v2b",fmtPct);
+  setMulti("m-hv","hv",fmtInt);
+  setMulti("m-cphv","cphv",fmtINR0);
+  setMulti("m-b2h","b2h",fmtPct);
+  setMulti("m-orders","orders",fmtInt);
+  setMulti("m-l2o",null,fmtPct,l2o);
+  setMulti("m-v2o","v2o",fmtPct);
+  setMulti("m-h2o","h2o",fmtPct);
+  setMulti("m-revenue","revenue",fmtINR0);
+  setMulti("m-aov","aov",fmtINR0);
+  setMulti("m-cac","cac",fmtINR0);
+  setMulti("m-roas","roas",fmtMult);
+}
+
+function renderChips(all){el("c-all").textContent=all.length;el("c-under").textContent=all.filter(isUnder).length;el("c-top").textContent=all.filter(isTop).length;document.querySelectorAll("#chips .chip").forEach(b=>{b.classList.toggle("active",b.dataset.filter===state.filter);});}
+
+function renderHeader(){document.querySelectorAll("#dt thead th.sortable").forEach(th=>{const k=th.dataset.sort;const arr=th.querySelector(".arrow");if(k===state.sort.key){th.classList.add("active");arr.textContent=state.sort.dir==="asc"?"↑":"↓";}else{th.classList.remove("active");arr.textContent="↕";}});}
+
+function renderTable(){
+  const all=state.rows;
+  renderCards(all);renderChips(all);renderHeader();
+  const filtered=applyFilter(all,state.filter);
+  const sorted=sortRows(filtered,state.sort.key,state.sort.dir);
+  const tbody=el("rows");tbody.innerHTML="";
+  if(!sorted.length){
+    const tr=document.createElement("tr");
+    tr.innerHTML='<td colspan="12" class="empty">No ads match this filter.</td>';
+    tbody.appendChild(tr);el("dt").style.display="";el("loader").style.display="none";return;
+  }
+  let html="";
+  sorted.forEach((r,idx)=>{
+    const learn=metaLearning(r);
+    const budget=recommendedBudget(r);
+    const ordersTxt=(r.orders==null)?'<span class="span-cell-inner muted">—</span>':fmtInt(r.orders);
+    const revenueTxt=(r.revenue==null||r.revenue===0)?'<span class="span-cell-inner muted">—</span>':fmtINR0(r.revenue);
+    const ordersClass=(r.orders==null||r.orders===0)?"span-cell muted":"span-cell";
+    const revClass=(r.revenue==null||r.revenue===0)?"span-cell muted":"span-cell";
+    html+='<tr class="block-start row-life">'
+      +'<td class="ad-name" rowspan="5"><div class="row-num">#'+(idx+1)+'</div>'+escapeHtml(r.ad_name)+'</td>'
+      +'<td class="num">'+fmtINR0(r.lifetime.spend)+'</td>'
+      +'<td class="period">Lifetime</td>'
+      +'<td class="num">'+ctrPill(r.lifetime.ctr)+'</td>'
+      +'<td class="num">'+cplPill(r.lifetime.cpl)+'</td>'
+      +'<td class="num">'+fmtInt(r.lifetime.leads)+'</td>'
+      +'<td class="num">'+fmtInt(r.lifetime.valid_leads)+'</td>'
+      +'<td class="num">'+fmtPct(r.lifetime.valid_pct)+'</td>'
+      +'<td class="num">'+fmtInt(r.lifetime.nr_leads)+'</td>'
+      +'<td class="num">'+pill(r.lifetime.cpvl,"neutral",fmtINR0)+'</td>'
+      +'<td class="num '+ordersClass+'" rowspan="3">'+ordersTxt+'</td>'
+      +'<td class="num '+revClass+'" rowspan="3">'+revenueTxt+'</td>'
+      +'</tr>'
+      +'<tr class="row-l30">'
+      +'<td class="num">'+fmtINR0(r.l30.spend)+'</td>'
+      +'<td class="period">Last 30 days</td>'
+      +'<td class="num">'+ctrPill(r.l30.ctr)+'</td>'
+      +'<td class="num">'+cplPill(r.l30.cpl)+'</td>'
+      +'<td class="num">'+fmtInt(r.l30.leads)+'</td>'
+      +'<td class="num">'+fmtInt(r.l30.valid_leads)+'</td>'
+      +'<td class="num">'+fmtPct(r.l30.valid_pct)+'</td>'
+      +'<td class="num">'+fmtInt(r.l30.nr_leads)+'</td>'
+      +'<td class="num">'+pill(r.l30.cpvl,"neutral",fmtINR0)+'</td>'
+      +'</tr>'
+      +'<tr class="row-l7">'
+      +'<td class="num">'+fmtINR0(r.l7.spend)+'</td>'
+      +'<td class="period">Last 7 days</td>'
+      +'<td class="num">'+ctrPill(r.l7.ctr)+'</td>'
+      +'<td class="num">'+cplPill(r.l7.cpl)+'</td>'
+      +'<td class="num">'+fmtInt(r.l7.leads)+'</td>'
+      +'<td class="num">'+fmtInt(r.l7.valid_leads)+'</td>'
+      +'<td class="num">'+fmtPct(r.l7.valid_pct)+'</td>'
+      +'<td class="num">'+fmtInt(r.l7.nr_leads)+'</td>'
+      +'<td class="num">'+pill(r.l7.cpvl,"neutral",fmtINR0)+'</td>'
+      +'</tr>'
+      +'<tr class="info-row row-learn"><td class="info" colspan="11"><span class="lbl">Meta Learning Period</span>'+learn.html+'&nbsp;&nbsp;<span class="detail">'+learn.detail+'</span></td></tr>'
+      +'<tr class="info-row row-budget block-end"><td class="info" colspan="11"><span class="lbl">Recommended Budget</span>'+budget.html+'&nbsp;&nbsp;<span class="detail">'+budget.detail+'</span></td></tr>';
+  });
+  tbody.innerHTML=html;el("dt").style.display="";el("loader").style.display="none";
+}
+
+document.querySelectorAll("#chips .chip").forEach(b=>{b.addEventListener("click",()=>{state.filter=b.dataset.filter;localStorage.setItem(STORAGE_KEY+":filter",state.filter);renderTable();});});
+document.querySelectorAll("#dt thead th.sortable").forEach(th=>{th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sort.key===k)state.sort.dir=state.sort.dir==="asc"?"desc":"asc";else{state.sort.key=k;state.sort.dir="asc";}localStorage.setItem(STORAGE_KEY+":sort",JSON.stringify(state.sort));renderTable();});});
+
+async function loadFromCowork(){const resp=await window.cowork.callMcpTool(DRIVE_TOOL,{fileId:FILE_ID});const content=extractFileContent(resp);if(!content||content.length<1000)throw new Error("Drive MCP returned empty / truncated content.");return{ceRows:parsePrivyrFromNL(content),agrRows:parseAGRFromNL(content),pae:parsePAEFromNL(content)};}
+
+async function discoverGidForTab(tabName){let html="";try{const r=await fetch(PUBHTML_URL,{method:"GET",cache:"no-store"});if(!r.ok)return null;html=await r.text();}catch(e){return null;}if(!html)return null;const escaped=tabName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const patterns=[new RegExp('"name":"'+escaped+'"\\s*,\\s*"gid":"?(\\d+)','i'),new RegExp('"gid":"?(\\d+)"?\\s*,\\s*"name":"'+escaped+'"','i'),new RegExp('id="sheet-button-(\\d+)"[^>]*>[^<]*'+escaped,'i'),new RegExp('gid=(\\d+)[^>]*>[^<]*'+escaped,'i')];for(const re of patterns){const m=re.exec(html);if(m&&m[1])return m[1];}return null;}
+
+async function loadFromPublicCSV(){const ceUrl=CSV_URL+"&_="+Date.now();const ceResp=await fetch(ceUrl,{method:"GET",cache:"no-store",redirect:"follow"});if(!ceResp.ok)throw new Error("Privyr CE HTTP "+ceResp.status+" "+ceResp.statusText);const ceText=await ceResp.text();if(!ceText||ceText.length<200)throw new Error("Published Privyr CE CSV came back empty.");const ceRows=parsePrivyrFromCSV(ceText);
+  // AGR tab (per-ad orders/revenue match)
+  let agrRows=[],agrError=null;
+  const agrGid=await discoverGidForTab(AGR_TAB_NAME);
+  if(!agrGid){agrError='Could not discover gid for "'+AGR_TAB_NAME+'" from the published workbook.';}
+  else{try{const agrUrl=PUB_BASE+"?output=csv&gid="+agrGid+"&_="+Date.now();const agrResp=await fetch(agrUrl,{method:"GET",cache:"no-store",redirect:"follow"});if(!agrResp.ok)throw new Error("HTTP "+agrResp.status);const agrText=await agrResp.text();if(agrText&&agrText.length>50)agrRows=parseAGRFromCSV(agrText);}catch(e){agrError="Found AGR gid="+agrGid+" but the fetch failed: "+(e.message||e);}}
+  // Platform Ad Efficiency_Mktg tab (top-card period totals)
+  let pae=null,paeError=null;
+  const paeGid=await discoverGidForTab(PAE_TAB_NAME);
+  if(!paeGid){paeError='Could not discover gid for "'+PAE_TAB_NAME+'" from the published workbook.';}
+  else{try{const paeUrl=PUB_BASE+"?output=csv&gid="+paeGid+"&_="+Date.now();const paeResp=await fetch(paeUrl,{method:"GET",cache:"no-store",redirect:"follow"});if(!paeResp.ok)throw new Error("HTTP "+paeResp.status);const paeText=await paeResp.text();if(paeText&&paeText.length>50)pae=parsePAEFromCSV(paeText);}catch(e){paeError="Found PAE gid="+paeGid+" but the fetch failed: "+(e.message||e);}}
+  return{ceRows,agrRows,agrError,pae,paeError};}
+
+async function load(){setStamp();const inCowork=!!(window.cowork&&typeof window.cowork.callMcpTool==="function");let bundle;try{bundle=inCowork?await loadFromCowork():await loadFromPublicCSV();}catch(err){const msg=err&&err.message?err.message:String(err);if(inCowork){showError("Couldn't load via Cowork's Drive MCP",msg);}else{showError("Couldn't fetch the published CSV",msg+"\n\nIf this is a CORS/network error in a file:// page, try a tiny local server:\n  python -m http.server 8000\nand open http://localhost:8000/privyr-creative-effectiveness.html\n\nAlso confirm the workbook is still set to File → Share → Publish to web,\nand that gid="+SHEET_GID+" is the Privyr CE tab.");}return;}const{ceRows,agrRows,agrError,pae,paeError}=bundle;if(!ceRows.length){showError("No active rows found",'The Privyr CE tab returned 0 rows where column F = "active".');return;}const agrMap=buildAGRMap(agrRows);mergeAGRIntoCE(ceRows,agrMap);state.rows=ceRows;state.totals=privyrTotals(agrRows);state.pae=pae||null;if(agrError){showError("Orders / Revenue (per-ad) not loaded",agrError+"\n\nFix: open the workbook → click the \"Ad Generated Revenue\" tab → look at the URL — the number after gid= is the value we need.","warn");}if(paeError){showError("Top-card period totals not loaded",paeError+"\n\nFix: open the workbook → click the \"Platform Ad Efficiency_Mktg\" tab → copy the number after gid= from the URL and send it to me.","warn");}renderTable();}
+
+load();
+})();
+</script>
+</body>
+</html>
+      
