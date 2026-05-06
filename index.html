@@ -52,16 +52,23 @@
   .chip .count{margin-left:6px;opacity:.7;font-variant-numeric:tabular-nums}
   .table-wrap{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
   table.dt{width:100%;border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums}
-  table.dt thead th{text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted);padding:12px 14px;background:var(--line-soft);border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;z-index:5;box-shadow:0 1px 0 var(--line)}
+  table.dt thead th{text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted);padding:12px 14px;background:var(--line-soft);border-bottom:1px solid var(--line);border-right:1px solid var(--line-soft);white-space:nowrap}
+  table.dt thead th:last-child{border-right:none}
+  /* Per-ad-set section header row — repeats the column labels above every ad block */
+  tr.section-header td{background:var(--line-soft);border-top:2px solid var(--line);border-bottom:1px solid var(--line);border-right:1px solid var(--line-soft);font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;color:var(--ink-muted);padding:10px 14px;white-space:nowrap}
+  tr.section-header td:last-child{border-right:none}
+  tr.section-header td.sh-num{text-align:right}
+  tr.section-header td.sh-ad-name{position:sticky;left:0;z-index:3;background:var(--line-soft);font-weight:700;color:var(--ink);box-shadow:1px 0 0 var(--line-soft)}
   /* Top-left corner cell: sticky in BOTH directions, must sit above other sticky cells */
-  table.dt thead th:first-child{border-top-left-radius:var(--radius);left:0;z-index:7;box-shadow:1px 1px 0 var(--line)}
+  table.dt thead th:first-child{border-top-left-radius:var(--radius)}
   table.dt thead th:last-child{border-top-right-radius:var(--radius)}
   table.dt tbody tr:last-child td:first-child{border-bottom-left-radius:var(--radius)}
   table.dt tbody tr:last-child td:last-child{border-bottom-right-radius:var(--radius)}
   table.dt thead th.sortable{cursor:pointer;user-select:none}
   table.dt thead th .arrow{opacity:.5;margin-left:4px;font-size:10px}
   table.dt thead th.active .arrow{opacity:1;color:var(--accent)}
-  table.dt tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;background:var(--panel)}
+  table.dt tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;background:var(--panel);border-right:1px solid var(--line-soft)}
+  table.dt tbody td:last-child{border-right:none}
   /* Subtle, consistent separators between metric rows */
   tr.row-life td,tr.row-l30 td{border-bottom:1px dashed var(--line-soft)}
   tr.row-l7 td{border-bottom:1px solid var(--line-soft)}
@@ -264,8 +271,8 @@
       <thead>
         <tr>
           <th class="sortable" data-sort="ad_name">Ad Name <span class="arrow">↕</span></th>
-          <th class="num sortable" data-sort="spend">Spend (₹) <span class="arrow">↕</span></th>
           <th>Period</th>
+          <th class="num sortable" data-sort="spend">Spend (₹) <span class="arrow">↕</span></th>
           <th class="num sortable" data-sort="ctr">CTR <span class="arrow">↕</span></th>
           <th class="num sortable active" data-sort="cpl">CPL <span class="arrow">↑</span></th>
           <th class="num sortable" data-sort="leads">Leads <span class="arrow">↕</span></th>
@@ -292,7 +299,7 @@
 </div>
 <script>
 (()=>{"use strict";
-const STORAGE_KEY="privyr-creative-effectiveness:v8";
+const STORAGE_KEY="privyr-creative-effectiveness:v9";
 const FILE_ID="1vE4GY-6l2YIBz5rWy6uKvHc8ReuFwBgS";
 const DRIVE_TOOL="mcp__66fa5073-4346-419f-88aa-c11cfb492155__read_file_content";
 const PUB_BASE="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDP0_BGmMv5wOX8VsPgLQ2EUkcRnYZOrl-4X0jAhFVAHkSGTh2Jx1ltQ671ALGOA/pub";
@@ -517,10 +524,10 @@ function renderTable(){
     const revenueTxt=(r.revenue==null||r.revenue===0)?'<span class="span-cell-inner muted">—</span>':fmtINR0(r.revenue);
     const ordersClass=(r.orders==null||r.orders===0)?"span-cell muted":"span-cell";
     const revClass=(r.revenue==null||r.revenue===0)?"span-cell muted":"span-cell";
-    html+='<tr class="block-start row-life">'
-      +'<td class="ad-name" rowspan="5"><div class="row-num">#'+(idx+1)+'</div>'+escapeHtml(r.ad_name)+'</td>'
-      +'<td class="num">'+fmtINR0(r.lifetime.spend)+'</td>'
+    html+='<tr class="section-header">'+'<td class="sh-ad-name">#'+(idx+1)+' · '+escapeHtml(r.ad_name).slice(0,40)+(r.ad_name.length>40?"…":"")+'</td>'+'<td>Period</td>'+'<td class="sh-num">Spend (₹)</td>'+'<td class="sh-num">CTR</td>'+'<td class="sh-num">CPL</td>'+'<td class="sh-num">Leads</td>'+'<td class="sh-num">Valid Leads</td>'+'<td class="sh-num">Valid %</td>'+'<td class="sh-num">NR Leads</td>'+'<td class="sh-num">CPVL</td>'+'<td class="sh-num">Orders</td>'+'<td class="sh-num">Revenue</td>'+'</tr>';html+='<tr class="block-start row-life">'
+      +'<td class="ad-name" rowspan="5">'+escapeHtml(r.ad_name)+'</td>'
       +'<td class="period">Lifetime</td>'
+      +'<td class="num">'+fmtINR0(r.lifetime.spend)+'</td>'
       +'<td class="num">'+ctrPill(r.lifetime.ctr)+'</td>'
       +'<td class="num">'+cplPill(r.lifetime.cpl)+'</td>'
       +'<td class="num">'+fmtInt(r.lifetime.leads)+'</td>'
@@ -532,8 +539,8 @@ function renderTable(){
       +'<td class="num '+revClass+'" rowspan="3">'+revenueTxt+'</td>'
       +'</tr>'
       +'<tr class="row-l30">'
-      +'<td class="num">'+fmtINR0(r.l30.spend)+'</td>'
       +'<td class="period">Last 30 days</td>'
+      +'<td class="num">'+fmtINR0(r.l30.spend)+'</td>'
       +'<td class="num">'+ctrPill(r.l30.ctr)+'</td>'
       +'<td class="num">'+cplPill(r.l30.cpl)+'</td>'
       +'<td class="num">'+fmtInt(r.l30.leads)+'</td>'
@@ -543,8 +550,8 @@ function renderTable(){
       +'<td class="num">'+pill(r.l30.cpvl,"neutral",fmtINR0)+'</td>'
       +'</tr>'
       +'<tr class="row-l7">'
-      +'<td class="num">'+fmtINR0(r.l7.spend)+'</td>'
       +'<td class="period">Last 7 days</td>'
+      +'<td class="num">'+fmtINR0(r.l7.spend)+'</td>'
       +'<td class="num">'+ctrPill(r.l7.ctr)+'</td>'
       +'<td class="num">'+cplPill(r.l7.cpl)+'</td>'
       +'<td class="num">'+fmtInt(r.l7.leads)+'</td>'
