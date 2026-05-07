@@ -1000,8 +1000,8 @@ function renderSummaryFunnelColumn(sd, pk){
 
   let h = '';
   steps.forEach((s,i)=>{
-    // Connector before each step EXCEPT the first (Spend) and skip for Revenue (we add a custom block below)
-    if(i>0 && s.id!=="revenue"){
+    // Connector before each step EXCEPT the first (Spend) and skip for ALL Revenue cards (handled below).
+    if(i>0 && !s.isRevenue){
       const isBig = (i===biggest);
       const conv = s.conv;
       if(conv!=null){
