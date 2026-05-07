@@ -235,11 +235,11 @@
   @media (max-width:680px){.rm-pie-stage{width:100%;aspect-ratio:1.4/1}}
 
   /* External slice labels (rendered as SVG <text>) */
-  .rm-slice-label .lbl-name{font-size:12px;font-weight:700;fill:#3a2552}
-  .rm-slice-label .lbl-val{font-size:13px;font-weight:800;fill:#3a2552}
-  .rm-slice-label .lbl-pct{font-size:11px;font-weight:700;fill:#6f2da8}
-  .rm-slice-leader{stroke-width:1.4;fill:none}
-  .rm-slice-dot{r:2.6}
+  .rm-slice-label .lbl-name{font-size:15px;font-weight:700;fill:#3a2552;letter-spacing:.005em}
+  .rm-slice-label .lbl-val{font-size:15px;font-weight:800;fill:#3a2552}
+  .rm-slice-label .lbl-pct{font-size:14px;font-weight:800;fill:#6f2da8}
+  .rm-slice-leader{stroke-width:1.6;fill:none;opacity:.85}
+  .rm-slice-dot{r:3.2}
 
   /* Extra-note legend (compact, below the chart) */
   .rm-extra-note{margin-top:14px;padding-top:12px;border-top:1px dashed #e3d3f3}
@@ -1115,8 +1115,8 @@ function drawPie(pieNode, legendNode, segments, colors, totalOverride){
   });
 
   // Render external labels with leader lines and anti-collision on the y axis.
-  // Skip slices that are too small (< 3%) to keep things clean — they still appear in legend.
-  const visibleLabels = segMeta.filter(m=>m.frac >= 0.03);
+  // Show a label for EVERY non-zero slice (Society Standee at 1% etc.).
+  const visibleLabels = segMeta.slice();
   // Compute initial anchor points for each label
   const labelInfos = visibleLabels.map(m=>{
     const ax = cx + r*Math.cos(m.aMid);
@@ -1129,7 +1129,7 @@ function drawPie(pieNode, legendNode, segments, colors, totalOverride){
     return {m, ax, ay, isRight, elbowX, elbowY, textX, textY};
   });
   // Anti-collision: split into right/left, sort by Y, stack with min spacing.
-  const SPACING = 38;
+  const SPACING = 46;
   const rightLabels = labelInfos.filter(L=>L.isRight).sort((a,b)=>a.textY-b.textY);
   const leftLabels = labelInfos.filter(L=>!L.isRight).sort((a,b)=>a.textY-b.textY);
   const fixStack = (arr)=>{
@@ -1176,8 +1176,8 @@ function drawPie(pieNode, legendNode, segments, colors, totalOverride){
     const valStr = fmtINR0(m.s.value||0);
     const pctStr = (m.frac*100).toFixed(1)+'%';
     svg += '<g class="rm-slice-label" text-anchor="'+anchor+'">'
-      + '<text class="lbl-name" x="'+tx+'" y="'+(ty-6)+'">'+escapeHtml(m.s.name)+'</text>'
-      + '<text class="lbl-val"  x="'+tx+'" y="'+(ty+11)+'">'+valStr+' &middot; <tspan class="lbl-pct">'+pctStr+'</tspan></text>'
+      + '<text class="lbl-name" x="'+tx+'" y="'+(ty-9)+'">'+escapeHtml(m.s.name)+'</text>'
+      + '<text class="lbl-val"  x="'+tx+'" y="'+(ty+13)+'">'+valStr+' &middot; <tspan class="lbl-pct">'+pctStr+'</tspan></text>'
       + '</g>';
   });
 
