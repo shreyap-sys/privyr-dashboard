@@ -1611,19 +1611,34 @@ function renderFunnelColumn(pae,pk){
     const costFmt=(s.id==='revenue' ? (s.cost==null?'—':Number(s.cost).toFixed(2)+'x') : fmtINR0(s.cost));
     const convLine=(s.conv==null)?('<span>'+(i===0?'Top of funnel':'')+'</span>'):('<span class="conv">'+s.conv.toFixed(1)+'%</span> from '+s.prevName);
     const costLine=(s.cost==null)?'':('<span class="cost">'+s.costLbl+' '+costFmt+'</span>');
-    let metaHtml;
     if(s.isRevenue){
-      const roasFmt=(s.cost==null||isNaN(s.cost))?'—':Number(s.cost).toFixed(2)+'x';
-      metaHtml='<div class="revenue-roas"><div class="rr-lbl">ROAS</div><div class="rr-val">'+roasFmt+'</div></div>';
+      // Privyr Revenue card: rupee icon + 2x2 grid (Orders, AOV, ROAS, CAC) UNDER the amount.
+      const ord = (g("orders")==null||isNaN(g("orders")))?'—':fmtInt(g("orders"));
+      const aov = (g("aov")==null||isNaN(g("aov")))?'—':fmtINR0(g("aov"));
+      const roasV = g("roas");
+      const roasFmt = (roasV==null||isNaN(roasV))?'—':Number(roasV).toFixed(2)+'x';
+      const cac = (g("cac")==null||isNaN(g("cac")))?'—':fmtINR0(g("cac"));
+      const secondary = '<div class="rev-secondary grid-2x2">'
+        +'<span class="metric"><span class="lbl">Orders</span><span class="val">'+ord+'</span></span>'
+        +'<span class="metric"><span class="lbl">AOV</span><span class="val">'+aov+'</span></span>'
+        +'<span class="metric"><span class="lbl">ROAS</span><span class="val">'+roasFmt+'</span></span>'
+        +'<span class="metric"><span class="lbl">CAC</span><span class="val">'+cac+'</span></span>'
+        +'</div>';
+      h+='<div class="funnel-step '+wcls+' revenue">'
+        +'<div class="fs-icon">'+RUPEE_ICON+'</div>'
+        +'<div class="fs-label">'+s.label+'</div>'
+        +'<div class="fs-value">'+valFmt+'</div>'
+        +secondary
+        +'</div>';
     } else {
-      metaHtml='<div class="fs-meta">'+convLine+costLine+'</div>';
+      const metaHtml='<div class="fs-meta">'+convLine+costLine+'</div>';
+      h+='<div class="funnel-step '+wcls+'">'
+         +'<div class="fs-icon">'+s.icon+'</div>'
+         +'<div class="fs-label">'+s.label+'</div>'
+         +'<div class="fs-value">'+valFmt+'</div>'
+         +metaHtml
+         +'</div>';
     }
-    h+='<div class="funnel-step '+wcls+(s.isRevenue?' revenue':'')+'">'
-       +'<div class="fs-icon">'+s.icon+'</div>'
-       +'<div class="fs-label">'+s.label+'</div>'
-       +'<div class="fs-value">'+valFmt+'</div>'
-       +metaHtml
-       +'</div>';
   });
   return h;
 }
