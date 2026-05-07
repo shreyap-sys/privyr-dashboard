@@ -110,7 +110,9 @@
   .funnel-step.revenue > *{position:relative;z-index:1}
   .funnel-step.revenue .fs-icon{background:rgba(255,255,255,0.25);color:#fff;box-shadow:0 0 14px rgba(255,255,255,0.18),inset 0 1px 0 rgba(255,255,255,0.4)}
   .funnel-step.revenue .fs-label{color:rgba(255,255,255,0.92)}
-  .funnel-step.revenue .fs-value{color:#fff;font-size:26px;text-shadow:0 1px 2px rgba(0,0,0,0.18)}
+  .funnel-step.revenue{padding:14px 18px;align-items:center}
+  .funnel-step.revenue .fs-value{color:#fff;font-size:24px;text-shadow:0 1px 2px rgba(0,0,0,0.18);text-align:right}
+  .funnel-step.revenue .fs-label{font-size:10.5px;letter-spacing:.08em}
   /* ROAS prominent block on the right side of the revenue card */
   .funnel-step.revenue .revenue-roas{display:flex;flex-direction:column;align-items:flex-end;padding-left:16px;border-left:1px solid rgba(255,255,255,0.38);min-width:62px}
   .funnel-step.revenue .revenue-roas .rr-lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,0.78);font-weight:700;margin-bottom:3px;line-height:1}
@@ -197,8 +199,10 @@
   .funnel-step.revenue.clickable{cursor:pointer;transition:transform 140ms ease,box-shadow 140ms ease}
   .funnel-step.revenue.clickable:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(111,45,168,.42),inset 0 1px 0 rgba(255,255,255,.32)}
   .funnel-step.revenue.clickable::after,.funnel-step.revenue.clickable::before{pointer-events:none}
-  /* "Click to drill down" hint at the BOTTOM of the card */
-  .funnel-step.revenue .rm-hint{position:relative;z-index:1;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;opacity:.9;margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;gap:5px}
+  /* Label group — stacks the LABEL and the "click to drill down" hint */
+  .fs-label-group{display:flex;flex-direction:column;gap:3px;min-width:0}
+  /* "click to drill down" hint sits right under the label, normal-cased, lighter */
+  .funnel-step.revenue .rm-hint{position:relative;z-index:1;font-size:10.5px;font-weight:600;letter-spacing:.02em;text-transform:none;opacity:.78;color:rgba(255,255,255,.92);display:inline-flex;align-items:center;gap:4px;margin:0;padding:0;border:none;white-space:nowrap}
   .funnel-step.revenue .rm-hint svg{width:11px;height:11px}
 
   /* Organic Revenue — a level darker purple */
@@ -216,10 +220,11 @@
   .funnel-step.organic-rev .fs-value{position:relative;z-index:1}
 
   /* Two-up Orders/AOV/CAC mini-grid for Total Revenue card */
-  .rev-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;position:relative;z-index:1;margin-top:6px;padding-top:8px;border-top:1px solid rgba(255,255,255,.18)}
-  .rev-mini-grid .rmg-item .lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.78);text-transform:uppercase;letter-spacing:.04em}
-  .rev-mini-grid .rmg-item .val{font-size:14px;font-weight:800;color:#fff;margin-top:1px}
-  .rev-mini-grid.single{grid-template-columns:1fr}
+  /* Side-meta grid: sits to the RIGHT of the revenue value (4th grid cell of .funnel-step) */
+  .rev-mini-grid{display:grid;grid-template-columns:auto auto;gap:4px 14px;position:relative;z-index:1;padding-left:16px;border-left:1px solid rgba(255,255,255,.38);text-align:right;min-width:max-content}
+  .rev-mini-grid .rmg-item .lbl{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.78);text-transform:uppercase;letter-spacing:.08em;line-height:1.1}
+  .rev-mini-grid .rmg-item .val{font-size:14px;font-weight:800;color:#fff;line-height:1.1;margin-top:1px;font-variant-numeric:tabular-nums}
+  .rev-mini-grid.single{grid-template-columns:auto;min-width:62px}
 
   /* Stack the 3 revenue cards tightly inside a column */
   .rev-stack{display:flex;flex-direction:column;gap:8px}
@@ -1027,8 +1032,6 @@ function renderSummaryFunnelColumn(sd, pk){
           +'<div class="rmg-item"><div class="lbl">CAC</div><div class="val">'+cac+'</div></div>'
           +'</div>';
       }
-      // "Click to drill down" hint at the BOTTOM
-      metaHtml += '<div class="rm-hint">click to drill down &rarr;</div>';
       dataAttr = ' data-period="'+pk+'" data-rev-kind="'+s.revKind+'" role="button" tabindex="0" aria-label="Open '+s.label+' breakdown"';
     } else if(s.isSpend){
       metaHtml = '<div class="fs-meta"><span>Total spend (paid media)</span></div>';
@@ -1038,9 +1041,12 @@ function renderSummaryFunnelColumn(sd, pk){
       const costLine = (s.cost==null)?'':('<span class="cost">'+s.costLbl+' '+fmtINR0(s.cost)+'</span>');
       metaHtml = '<div class="fs-meta">'+convLine+costLine+'</div>';
     }
+    const labelBlock = s.isRevenue
+      ? '<div class="fs-label-group"><div class="fs-label">'+s.label+'</div><div class="rm-hint">click to drill down &rarr;</div></div>'
+      : '<div class="fs-label">'+s.label+'</div>';
     h += '<div class="funnel-step '+wcls+extraCls+'"'+dataAttr+'>'
       + '<div class="fs-icon">'+s.icon+'</div>'
-      + '<div class="fs-label">'+s.label+'</div>'
+      + labelBlock
       + '<div class="fs-value">'+valFmt+'</div>'
       + metaHtml
       + '</div>';
