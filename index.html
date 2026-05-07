@@ -532,19 +532,180 @@
       <button class="tab-btn active" data-tab="overview" role="tab" aria-selected="true">Overview</button>
       <button class="tab-btn" data-tab="funnel" role="tab" aria-selected="false">Funnel</button>
     </div>
-    <div data-tab-id="overview" class="tab-content active" role="tabpanel">
-      <div class="placeholder-card">
-        <div class="pc-title">Website &middot; Overview</div>
-        <div class="pc-sub">Cards and per-ad table for the Website ECF (DoubleTick / Brevo) campaigns will sit here &mdash; same shape as Privyr Overview, sourced from the matching tabs in your sheet.</div>
-        <div class="pc-pill">Coming soon</div>
+<div id="ws-tab-overview" class="tab-content active" data-tab-id="overview" role="tabpanel">
+  <section id="ws-cards" class="grid-cards" aria-label="Summary">
+    <div class="card solo"><div class="lbl">Active Ads</div><div class="val" id="ws-m-active">—</div><div class="hint">column F = active</div></div>
+    <div class="card group">
+      <div class="lbl">Spend + Efficiency</div>
+      <div class="hint">Spend · CPL · CPVL</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">Spend</div>
+      <div class="gv" id="ws-m-spend-life">—</div>
+      <div class="gv" id="ws-m-spend-l30">—</div>
+      <div class="gv" id="ws-m-spend-l7">—</div>
+      <div class="gm">CPL</div>
+      <div class="gv" id="ws-m-cpl-life">—</div>
+      <div class="gv" id="ws-m-cpl-l30">—</div>
+      <div class="gv" id="ws-m-cpl-l7">—</div>
+      <div class="gm">CPVL</div>
+      <div class="gv" id="ws-m-cpvl-life">—</div>
+      <div class="gv" id="ws-m-cpvl-l30">—</div>
+      <div class="gv" id="ws-m-cpvl-l7">—</div>
       </div>
     </div>
-    <div data-tab-id="funnel" class="tab-content" role="tabpanel">
-      <div class="placeholder-card">
-        <div class="pc-title">Website &middot; Funnel</div>
-        <div class="pc-sub">Three-period customer journey for Website ECF will live here &mdash; same layout as the Privyr funnel.</div>
-        <div class="pc-pill">Coming soon</div>
+    <div class="card group">
+      <div class="lbl">Lead Quality</div>
+      <div class="hint">Leads · Valid · Conversion</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">Total Leads</div>
+      <div class="gv" id="ws-m-leads-life">—</div>
+      <div class="gv" id="ws-m-leads-l30">—</div>
+      <div class="gv" id="ws-m-leads-l7">—</div>
+      <div class="gm">Valid Leads</div>
+      <div class="gv" id="ws-m-valid-life">—</div>
+      <div class="gv" id="ws-m-valid-l30">—</div>
+      <div class="gv" id="ws-m-valid-l7">—</div>
+      <div class="gm">Lead → Valid %</div>
+      <div class="gv" id="ws-m-l2v-life">—</div>
+      <div class="gv" id="ws-m-l2v-l30">—</div>
+      <div class="gv" id="ws-m-l2v-l7">—</div>
       </div>
+    </div>
+    <div class="card group">
+      <div class="lbl">Brief Funnel</div>
+      <div class="hint">Brief Taken · Cost · Conversion</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">Brief Taken</div>
+      <div class="gv" id="ws-m-bt-life">—</div>
+      <div class="gv" id="ws-m-bt-l30">—</div>
+      <div class="gv" id="ws-m-bt-l7">—</div>
+      <div class="gm">CPBT</div>
+      <div class="gv" id="ws-m-cpbt-life">—</div>
+      <div class="gv" id="ws-m-cpbt-l30">—</div>
+      <div class="gv" id="ws-m-cpbt-l7">—</div>
+      <div class="gm">Valid → Brief %</div>
+      <div class="gv" id="ws-m-v2b-life">—</div>
+      <div class="gv" id="ws-m-v2b-l30">—</div>
+      <div class="gv" id="ws-m-v2b-l7">—</div>
+      </div>
+    </div>
+    <div class="card group">
+      <div class="lbl">Home Visit Funnel</div>
+      <div class="hint">Home Visits · Cost · Conversion</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">Home Visits</div>
+      <div class="gv" id="ws-m-hv-life">—</div>
+      <div class="gv" id="ws-m-hv-l30">—</div>
+      <div class="gv" id="ws-m-hv-l7">—</div>
+      <div class="gm">CPHV</div>
+      <div class="gv" id="ws-m-cphv-life">—</div>
+      <div class="gv" id="ws-m-cphv-l30">—</div>
+      <div class="gv" id="ws-m-cphv-l7">—</div>
+      <div class="gm">Brief → Visit %</div>
+      <div class="gv" id="ws-m-b2h-life">—</div>
+      <div class="gv" id="ws-m-b2h-l30">—</div>
+      <div class="gv" id="ws-m-b2h-l7">—</div>
+      </div>
+    </div>
+    <div class="card group">
+      <div class="lbl">Orders Funnel</div>
+      <div class="hint">Orders · stage conversions</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">Orders</div>
+      <div class="gv" id="ws-m-orders-life">—</div>
+      <div class="gv" id="ws-m-orders-l30">—</div>
+      <div class="gv" id="ws-m-orders-l7">—</div>
+      <div class="gm">Lead → Order %</div>
+      <div class="gv" id="ws-m-l2o-life">—</div>
+      <div class="gv" id="ws-m-l2o-l30">—</div>
+      <div class="gv" id="ws-m-l2o-l7">—</div>
+      <div class="gm">Valid → Order %</div>
+      <div class="gv" id="ws-m-v2o-life">—</div>
+      <div class="gv" id="ws-m-v2o-l30">—</div>
+      <div class="gv" id="ws-m-v2o-l7">—</div>
+      <div class="gm">Visit → Order %</div>
+      <div class="gv" id="ws-m-h2o-life">—</div>
+      <div class="gv" id="ws-m-h2o-l30">—</div>
+      <div class="gv" id="ws-m-h2o-l7">—</div>
+      </div>
+    </div>
+    <div class="card group">
+      <div class="lbl">Revenue Block</div>
+      <div class="hint">Revenue · AOV</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">Revenue</div>
+      <div class="gv" id="ws-m-revenue-life">—</div>
+      <div class="gv" id="ws-m-revenue-l30">—</div>
+      <div class="gv" id="ws-m-revenue-l7">—</div>
+      <div class="gm">Avg Order Value</div>
+      <div class="gv" id="ws-m-aov-life">—</div>
+      <div class="gv" id="ws-m-aov-l30">—</div>
+      <div class="gv" id="ws-m-aov-l7">—</div>
+      </div>
+    </div>
+    <div class="card group">
+      <div class="lbl">Profitability</div>
+      <div class="hint">CAC · ROAS</div>
+      <div class="group-grid">
+        <div class="gh first"></div><div class="gh">Lifetime</div><div class="gh">L30</div><div class="gh">L7</div>
+      <div class="gm">CAC</div>
+      <div class="gv" id="ws-m-cac-life">—</div>
+      <div class="gv" id="ws-m-cac-l30">—</div>
+      <div class="gv" id="ws-m-cac-l7">—</div>
+      <div class="gm">ROAS</div>
+      <div class="gv" id="ws-m-roas-life">—</div>
+      <div class="gv" id="ws-m-roas-l30">—</div>
+      <div class="gv" id="ws-m-roas-l7">—</div>
+      </div>
+    </div>
+  </section>
+  <div class="toolbar" id="ws-chips" role="tablist" aria-label="Filter">
+    <button class="chip active" data-filter="all">All active <span class="count" id="ws-c-all">0</span></button>
+    <button class="chip" data-filter="under">Underperforming (CPL &gt; ₹300 and CTR &lt; 1%) <span class="count" id="ws-c-under">0</span></button>
+    <button class="chip" data-filter="top">Top performers (CPL ≤ ₹300 AND CTR ≥ 1%) <span class="count" id="ws-c-top">0</span></button>
+  </div>
+  <div id="ws-err"></div>
+  <div class="table-wrap" id="ws-table-wrap">
+    <div id="ws-loader" class="loading"><span class="spinner"></span>Loading live <code>Website ECF ad data</code>…</div>
+    <table class="dt" id="ws-dt" style="display:none">
+      <thead>
+        <tr>
+          <th class="sortable" data-sort="ad_name">Ad Name <span class="arrow">↕</span></th>
+          <th>Period</th>
+          <th class="num sortable" data-sort="spend">Spend (₹) <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="ctr">CTR <span class="arrow">↕</span></th>
+          <th class="num sortable active" data-sort="cpl">CPL <span class="arrow">↑</span></th>
+          <th class="num sortable" data-sort="leads">Leads <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="valid_leads">Valid Leads <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="valid_pct">Valid % <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="nr_leads">NR Leads <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="cpvl">CPVL <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="orders">Orders <span class="arrow">↕</span></th>
+          <th class="num sortable" data-sort="revenue">Revenue <span class="arrow">↕</span></th>
+        </tr>
+      </thead>
+      <tbody id="ws-rows"></tbody>
+    </table>
+  </div>
+  <div class="legend">
+    <span><i class="sw sage"></i> within target</span>
+    <span><i class="sw rose"></i> outside target</span>
+    <span><i class="sw amber"></i> learning</span>
+    <span>· CTR ≥ 1%, CPL ≤ ₹300 · Sort by Lifetime · Meta Learning uses L7 leads vs 50/wk</span>
+  </div>
+  <div class="footnote">
+    Recommended Budget = 50 × L30 CPL (falls back to Lifetime CPL when L30 has no leads). Daily ≈ weekly ÷ 7. Orders &amp; Revenue per ad are matched from "Ad Generated Revenue" via the Helper Column. AOV = Total Revenue ÷ Total Orders. ROAS = Total Revenue ÷ Active-ads Lifetime Spend.
+  </div>
+  </div> <!-- /#ws-tab-overview -->
+
+    <div id="ws-tab-funnel" class="tab-content" data-tab-id="funnel" role="tabpanel">
+      <div class="funnel-empty">Loading funnel&hellip;</div>
     </div>
   </div>
 
@@ -623,6 +784,9 @@ const AGR_GID="497381798"; // Ad Generated Revenue
 const PAE_GID="1240428045"; // Platform Ad Efficiency_Mktg
 const SUMMARY_GID="1164859268"; // Summary Dashboard
 const README_GID="1292439970"; // README tab (date in A15)
+const WS_CE_GID="383393525"; // Website ECF per-ad (Creative-Effectiveness-style)
+const WS_CPL_THRESHOLD=300;
+const WS_CTR_THRESHOLD=1;
 const CSV_URL=PUB_BASE+"?output=csv&gid="+SHEET_GID;
 const AGR_TAB_NAME="Ad Generated Revenue";
 const PAE_TAB_NAME="Platform Ad Efficiency_Mktg";
@@ -663,6 +827,7 @@ function parseAGRFromNL(content){const tabStart=content.indexOf("Ad Generated Re
 function buildAGRMap(agrRows){const m=new Map();for(const r of agrRows){if(!r.helper_key)continue;const prev=m.get(r.helper_key);if(prev)m.set(r.helper_key,{orders:prev.orders+r.orders,revenue:prev.revenue+r.revenue});else m.set(r.helper_key,{orders:r.orders,revenue:r.revenue});}return m;}
 
 function privyrTotals(agrRows){let orders=0,revenue=0,count=0;for(const r of agrRows){if(r.platform.toLowerCase()!=="privyr")continue;orders+=Number(r.orders)||0;revenue+=Number(r.revenue)||0;count++;}return{orders,revenue,rowCount:count};}
+function websiteTotals(agrRows){let orders=0,revenue=0,count=0;for(const r of agrRows){if(r.platform.toLowerCase()!=="website")continue;orders+=Number(r.orders)||0;revenue+=Number(r.revenue)||0;count++;}return{orders,revenue,rowCount:count};}
 
 function mergeAGRIntoCE(ceRows,agrMap){for(const r of ceRows){const hit=agrMap.get(r.helper_key);if(hit){r.orders=hit.orders;r.revenue=hit.revenue;}}}
 
@@ -693,7 +858,10 @@ const PAE_LABEL_KEY={
   "v2o":["Valid Lead → Order %","Valid Lead -> Order %"]
 };
 function paeNorm(s){return String(s||"").replace(/\\_/g,"_").replace(/\s+/g," ").trim();}
-function buildPAEResult(metricByLabel){
+const PAE_COL_INDICES={privyr:{lifetime:2,l30:5,l7:8}, website:{lifetime:3,l30:6,l7:9}};
+function buildPAEResult(metricByLabel, scope){
+  scope = scope || "privyr";
+  const idx = PAE_COL_INDICES[scope] || PAE_COL_INDICES.privyr;
   const out={};
   for(const key in PAE_LABEL_KEY){
     const aliases=PAE_LABEL_KEY[key];
@@ -707,11 +875,11 @@ function buildPAEResult(metricByLabel){
       }
     }
     if(!row){out[key]=null;continue;}
-    out[key]={lifetime:num(row[2]),l30:num(row[5]),l7:num(row[8])};
+    out[key]={lifetime:num(row[idx.lifetime]),l30:num(row[idx.l30]),l7:num(row[idx.l7])};
   }
   return out;
 }
-function parsePAEFromCSV(csvText){
+function parsePAEFromCSV(csvText, scope){
   const all=parseCSV(csvText);
   const map={};
   for(const cols of all){
@@ -720,9 +888,9 @@ function parsePAEFromCSV(csvText){
     if(!lbl||/^metric$/i.test(lbl))continue;
     map[lbl]=cols;
   }
-  return buildPAEResult(map);
+  return buildPAEResult(map, scope);
 }
-function parsePAEFromNL(content){
+function parsePAEFromNL(content, scope){
   const tabStart=content.indexOf("Platform Ad Efficiency");
   if(tabStart<0)return null;
   const headerIdx=content.indexOf("Metric,DoubleTick,Privyr,Website ECF",tabStart);
@@ -756,7 +924,7 @@ function parsePAEFromNL(content){
     if(!lbl)continue;
     map[lbl]=cols;
   }
-  return buildPAEResult(map);
+  return buildPAEResult(map, scope);
 }
 
 // === Summary Dashboard: parsers + renderers + modal ===
@@ -1378,7 +1546,14 @@ function drawPie(pieNode, legendNode, segments, colors, totalOverride){
   }).join('');
 }
 
-const state={rows:[],totals:{orders:null,revenue:null,rowCount:0},pae:null,summary:null,summaryError:null,filter:localStorage.getItem(STORAGE_KEY+":filter")||"all",sort:JSON.parse(localStorage.getItem(STORAGE_KEY+":sort")||'{"key":"cpl","dir":"asc"}')};
+const state={rows:[],totals:{orders:null,revenue:null,rowCount:0},pae:null,summary:null,summaryError:null,filter:localStorage.getItem(STORAGE_KEY+":filter")||"all",sort:JSON.parse(localStorage.getItem(STORAGE_KEY+":sort")||'{"key":"cpl","dir":"asc"}'),website:{rows:[],totals:{orders:null,revenue:null,rowCount:0},pae:null,filter:localStorage.getItem(STORAGE_KEY+":ws-filter")||"all",sort:JSON.parse(localStorage.getItem(STORAGE_KEY+":ws-sort")||'{"key":"cpl","dir":"asc"}')}};
+
+// Website filter helpers (CPL > 300 OR CTR < 1% = under, both within = top)
+const isWsUnder = r => (r.lifetime.cpl!=null && r.lifetime.cpl>WS_CPL_THRESHOLD) || (r.lifetime.ctr!=null && r.lifetime.ctr<WS_CTR_THRESHOLD);
+const isWsTop = r => (r.lifetime.cpl!=null && r.lifetime.cpl<=WS_CPL_THRESHOLD) && (r.lifetime.ctr!=null && r.lifetime.ctr>=WS_CTR_THRESHOLD);
+const applyWsFilter = (rows,f) => f==="under"?rows.filter(isWsUnder):f==="top"?rows.filter(isWsTop):rows.slice();
+const cplPillWs = v => pill(v,(v!=null && v<=WS_CPL_THRESHOLD)?"sage":(v==null?"neutral":"rose"),fmtINR0);
+
 
 const isUnder=r=>(r.lifetime.cpl!=null&&r.lifetime.cpl>150)||(r.lifetime.ctr!=null&&r.lifetime.ctr<1);
 const isTop=r=>(r.lifetime.cpl!=null&&r.lifetime.cpl<=150)&&(r.lifetime.ctr!=null&&r.lifetime.ctr>=1);
@@ -1501,8 +1676,203 @@ function renderTable(){
   tbody.innerHTML=html;el("dt").style.display="";el("loader").style.display="none";
 }
 
+// === Website (cloned from Privyr render functions, with ws-* DOM IDs and state.website) ===
+function renderWebsiteCards(all){
+  const W = state.website;
+  if(!el("ws-m-active")) return;
+  el("ws-m-active").textContent = all.length.toLocaleString("en-IN");
+  const periods=["lifetime","l30","l7"];
+  const periodIds={lifetime:"life",l30:"l30",l7:"l7"};
+  const pae = W.pae || {};
+  const ordersObj=pae.orders||null, leadsObj=pae.leads||null;
+  const l2o = (ordersObj && leadsObj) ? {
+    lifetime:(leadsObj.lifetime>0)?(ordersObj.lifetime/leadsObj.lifetime)*100:null,
+    l30:(leadsObj.l30>0)?(ordersObj.l30/leadsObj.l30)*100:null,
+    l7:(leadsObj.l7>0)?(ordersObj.l7/leadsObj.l7)*100:null
+  } : null;
+  const setMulti=(idBase,paeKey,fmt,override)=>{
+    const obj = override || (paeKey ? pae[paeKey] : null);
+    for(const p of periods){
+      const v = obj ? obj[p] : null;
+      const node = el("ws-"+idBase+"-"+periodIds[p]);
+      if(node){ node.textContent = fmt(v); node.classList.toggle("muted", v==null||isNaN(v)); }
+    }
+  };
+  setMulti("m-spend","spend",fmtINR0);
+  setMulti("m-cpl","cpl",fmtINR0);
+  setMulti("m-cpvl","cpvl",fmtINR0);
+  setMulti("m-leads","leads",fmtInt);
+  setMulti("m-valid","valid",fmtInt);
+  setMulti("m-l2v","l2v",fmtPct);
+  setMulti("m-bt","bt",fmtInt);
+  setMulti("m-cpbt","cpbt",fmtINR0);
+  setMulti("m-v2b","v2b",fmtPct);
+  setMulti("m-hv","hv",fmtInt);
+  setMulti("m-cphv","cphv",fmtINR0);
+  setMulti("m-b2h","b2h",fmtPct);
+  setMulti("m-orders","orders",fmtInt);
+  setMulti("m-l2o",null,fmtPct,l2o);
+  setMulti("m-v2o","v2o",fmtPct);
+  setMulti("m-h2o","h2o",fmtPct);
+  setMulti("m-revenue","revenue",fmtINR0);
+  setMulti("m-aov","aov",fmtINR0);
+  setMulti("m-cac","cac",fmtINR0);
+  setMulti("m-roas","roas",fmtMult);
+}
+
+function renderWebsiteChips(all){
+  if(!el("ws-c-all")) return;
+  el("ws-c-all").textContent = all.length;
+  el("ws-c-under").textContent = all.filter(isWsUnder).length;
+  el("ws-c-top").textContent = all.filter(isWsTop).length;
+  document.querySelectorAll("#ws-chips .chip").forEach(b=>{
+    b.classList.toggle("active", b.dataset.filter === state.website.filter);
+  });
+}
+
+function renderWebsiteHeader(){
+  document.querySelectorAll("#ws-dt thead th.sortable").forEach(th=>{
+    const k = th.dataset.sort;
+    const arr = th.querySelector(".arrow");
+    if(k === state.website.sort.key){
+      th.classList.add("active");
+      arr.textContent = state.website.sort.dir==="asc"?"↑":"↓";
+    } else {
+      th.classList.remove("active");
+      arr.textContent = "↕";
+    }
+  });
+}
+
+function renderWebsiteTable(){
+  const W = state.website;
+  const all = W.rows;
+  if(!el("ws-dt")) return;
+  renderWebsiteCards(all);
+  renderWebsiteChips(all);
+  renderWebsiteHeader();
+  const filtered = applyWsFilter(all, W.filter);
+  const sorted = sortRows(filtered, W.sort.key, W.sort.dir);
+  const tbody = el("ws-rows");
+  tbody.innerHTML = "";
+  if(!sorted.length){
+    const tr = document.createElement("tr");
+    tr.innerHTML = '<td colspan="12" class="empty">No ads match this filter.</td>';
+    tbody.appendChild(tr);
+    el("ws-dt").style.display = "";
+    el("ws-loader").style.display = "none";
+    return;
+  }
+  let h = "";
+  sorted.forEach((r,idx)=>{
+    const learn = metaLearning(r);
+    const budget = recommendedBudget(r);
+    const ordersTxt = (r.orders==null)?'<span class="span-cell-inner muted">&mdash;</span>':fmtInt(r.orders);
+    const revenueTxt = (r.revenue==null||r.revenue===0)?'<span class="span-cell-inner muted">&mdash;</span>':fmtINR0(r.revenue);
+    const ordersClass = (r.orders==null||r.orders===0)?"span-cell muted":"span-cell";
+    const revClass = (r.revenue==null||r.revenue===0)?"span-cell muted":"span-cell";
+    h += '<tr class="section-header">'
+      +'<td class="sh-ad-name">#'+(idx+1)+' &middot; '+escapeHtml(r.ad_name).slice(0,40)+(r.ad_name.length>40?"&hellip;":"")+'</td>'
+      +'<td>Period</td>'
+      +'<td class="sh-num">Spend (₹)</td>'
+      +'<td class="sh-num">CTR</td>'
+      +'<td class="sh-num">CPL</td>'
+      +'<td class="sh-num">Leads</td>'
+      +'<td class="sh-num">Valid Leads</td>'
+      +'<td class="sh-num">Valid %</td>'
+      +'<td class="sh-num">NR Leads</td>'
+      +'<td class="sh-num">CPVL</td>'
+      +'<td class="sh-num">Orders</td>'
+      +'<td class="sh-num">Revenue</td>'
+      +'</tr>';
+    h += '<tr class="block-start row-life">'
+      +'<td class="ad-name" rowspan="5">'+escapeHtml(r.ad_name)+'</td>'
+      +'<td class="period">Lifetime</td>'
+      +'<td class="num">'+fmtINR0(r.lifetime.spend)+'</td>'
+      +'<td class="num">'+ctrPill(r.lifetime.ctr)+'</td>'
+      +'<td class="num">'+cplPillWs(r.lifetime.cpl)+'</td>'
+      +'<td class="num">'+fmtInt(r.lifetime.leads)+'</td>'
+      +'<td class="num">'+fmtInt(r.lifetime.valid_leads)+'</td>'
+      +'<td class="num">'+fmtPct(r.lifetime.valid_pct)+'</td>'
+      +'<td class="num">'+fmtInt(r.lifetime.nr_leads)+'</td>'
+      +'<td class="num">'+pill(r.lifetime.cpvl,"neutral",fmtINR0)+'</td>'
+      +'<td class="num '+ordersClass+'" rowspan="3">'+ordersTxt+'</td>'
+      +'<td class="num '+revClass+'" rowspan="3">'+revenueTxt+'</td>'
+      +'</tr>'
+      +'<tr class="row-l30">'
+      +'<td class="period">Last 30 days</td>'
+      +'<td class="num">'+fmtINR0(r.l30.spend)+'</td>'
+      +'<td class="num">'+ctrPill(r.l30.ctr)+'</td>'
+      +'<td class="num">'+cplPillWs(r.l30.cpl)+'</td>'
+      +'<td class="num">'+fmtInt(r.l30.leads)+'</td>'
+      +'<td class="num">'+fmtInt(r.l30.valid_leads)+'</td>'
+      +'<td class="num">'+fmtPct(r.l30.valid_pct)+'</td>'
+      +'<td class="num">'+fmtInt(r.l30.nr_leads)+'</td>'
+      +'<td class="num">'+pill(r.l30.cpvl,"neutral",fmtINR0)+'</td>'
+      +'</tr>'
+      +'<tr class="row-l7">'
+      +'<td class="period">Last 7 days</td>'
+      +'<td class="num">'+fmtINR0(r.l7.spend)+'</td>'
+      +'<td class="num">'+ctrPill(r.l7.ctr)+'</td>'
+      +'<td class="num">'+cplPillWs(r.l7.cpl)+'</td>'
+      +'<td class="num">'+fmtInt(r.l7.leads)+'</td>'
+      +'<td class="num">'+fmtInt(r.l7.valid_leads)+'</td>'
+      +'<td class="num">'+fmtPct(r.l7.valid_pct)+'</td>'
+      +'<td class="num">'+fmtInt(r.l7.nr_leads)+'</td>'
+      +'<td class="num">'+pill(r.l7.cpvl,"neutral",fmtINR0)+'</td>'
+      +'</tr>'
+      +'<tr class="info-row row-learn"><td class="info" colspan="11"><span class="lbl">Meta Learning Period</span>'+learn.html+'&nbsp;&nbsp;<span class="detail">'+learn.detail+'</span></td></tr>'
+      +'<tr class="info-row row-budget block-end"><td class="info" colspan="11"><span class="lbl">Recommended Budget</span>'+budget.html+'&nbsp;&nbsp;<span class="detail">'+budget.detail+'</span></td></tr>';
+  });
+  tbody.innerHTML = h;
+  el("ws-dt").style.display = "";
+  el("ws-loader").style.display = "none";
+}
+
+function renderWebsiteFunnel(){
+  const pae = state.website.pae || {};
+  const node = el("ws-tab-funnel");
+  if(!node) return;
+  const periods=[{key:"lifetime",label:"Lifetime"},{key:"l30",label:"Last 30 days"},{key:"l7",label:"Last 7 days"}];
+  let html='<div class="funnels-row">';
+  for(const p of periods){
+    html += '<div class="funnel-column">';
+    html += '<div class="fc-title">'+p.label+'</div>';
+    html += renderFunnelColumn(pae, p.key);
+    html += '</div>';
+  }
+  html += '</div>';
+  node.innerHTML = html;
+}
+
+// Click handlers for Website chips + sort headers
+document.querySelectorAll("#ws-chips .chip").forEach(b=>{
+  b.addEventListener("click",()=>{
+    state.website.filter = b.dataset.filter;
+    localStorage.setItem(STORAGE_KEY+":ws-filter", state.website.filter);
+    renderWebsiteTable();
+  });
+});
+document.querySelectorAll("#ws-dt thead th.sortable").forEach(th=>{
+  th.addEventListener("click",()=>{
+    const k = th.dataset.sort;
+    if(state.website.sort.key === k) state.website.sort.dir = state.website.sort.dir==="asc"?"desc":"asc";
+    else { state.website.sort.key = k; state.website.sort.dir = "asc"; }
+    localStorage.setItem(STORAGE_KEY+":ws-sort", JSON.stringify(state.website.sort));
+    renderWebsiteTable();
+  });
+});
+
+
+
 document.querySelectorAll("#chips .chip").forEach(b=>{b.addEventListener("click",()=>{state.filter=b.dataset.filter;localStorage.setItem(STORAGE_KEY+":filter",state.filter);renderTable();});});
-document.querySelectorAll("#dt thead th.sortable").forEach(th=>{th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sort.key===k)state.sort.dir=state.sort.dir==="asc"?"desc":"asc";else{state.sort.key=k;state.sort.dir="asc";}localStorage.setItem(STORAGE_KEY+":sort",JSON.stringify(state.sort));if(summaryError){showError("Summary Dashboard not loaded",summaryError+"\n\nFix: open the workbook → click the \"Summary Dashboard\" tab → copy the number after gid= from the URL and send it to me.","warn");}renderTable();renderSummaryFunnel();});});
+document.querySelectorAll("#dt thead th.sortable").forEach(th=>{th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sort.key===k)state.sort.dir=state.sort.dir==="asc"?"desc":"asc";else{state.sort.key=k;state.sort.dir="asc";}localStorage.setItem(STORAGE_KEY+":sort",JSON.stringify(state.sort));if(summaryError){showError("Summary Dashboard not loaded",summaryError+"\n\nFix: open the workbook → click the \"Summary Dashboard\" tab → copy the number after gid= from the URL and send it to me.","warn");}
+  if(wsRowsError){showError("Website per-ad data not loaded", wsRowsError, "warn");}
+  if(wsPaeError){showError("Website ECF cards not loaded", wsPaeError, "warn");}
+  renderTable();
+  renderSummaryFunnel();
+  renderWebsiteTable();
+});});
 
 // Pulls A15 of the README tab to display next to the dashboard title.
 // In Cowork: parses the natural-language Drive content for the date-range pattern.
@@ -1538,7 +1908,17 @@ async function applyTitleDate(){
   t.innerHTML = 'India Meta Paid Ads Dashboard <span class="title-date">('+escapeHtml(d)+')</span>';
 }
 
-async function loadFromCowork(){const resp=await window.cowork.callMcpTool(DRIVE_TOOL,{fileId:FILE_ID});const content=extractFileContent(resp);if(!content||content.length<1000)throw new Error("Drive MCP returned empty / truncated content.");let summary=null,summaryError=null;try{summary=parseSummaryFromNL(content);}catch(e){summaryError=e&&e.message?e.message:String(e);}return{ceRows:parsePrivyrFromNL(content),agrRows:parseAGRFromNL(content),pae:parsePAEFromNL(content),summary,summaryError};}
+async function loadFromCowork(){
+  const resp=await window.cowork.callMcpTool(DRIVE_TOOL,{fileId:FILE_ID});
+  const content=extractFileContent(resp);
+  if(!content||content.length<1000)throw new Error("Drive MCP returned empty / truncated content.");
+  let summary=null,summaryError=null;
+  try{summary=parseSummaryFromNL(content);}catch(e){summaryError=e&&e.message?e.message:String(e);}
+  let wsPae=null,wsPaeError=null;
+  try{wsPae=parsePAEFromNL(content,"website");}catch(e){wsPaeError=e&&e.message?e.message:String(e);}
+  // Cowork has no separate Website CE feed via NL — leave wsRows empty (will fall back to public CSV in standalone).
+  return{ceRows:parsePrivyrFromNL(content),agrRows:parseAGRFromNL(content),pae:parsePAEFromNL(content,"privyr"),summary,summaryError,wsRows:[],wsPae,wsPaeError,wsRowsError:"Website per-ad table only loads on the standalone deployment (Render)."};
+}
 
 async function discoverGidForTab(tabName){let html="";try{const r=await fetch(PUBHTML_URL,{method:"GET",cache:"no-store"});if(!r.ok)return null;html=await r.text();}catch(e){return null;}if(!html)return null;const escaped=tabName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const patterns=[new RegExp('"name":"'+escaped+'"\\s*,\\s*"gid":"?(\\d+)','i'),new RegExp('"gid":"?(\\d+)"?\\s*,\\s*"name":"'+escaped+'"','i'),new RegExp('id="sheet-button-(\\d+)"[^>]*>[^<]*'+escaped,'i'),new RegExp('gid=(\\d+)[^>]*>[^<]*'+escaped,'i')];for(const re of patterns){const m=re.exec(html);if(m&&m[1])return m[1];}return null;}
 
@@ -1560,16 +1940,42 @@ async function loadFromPublicCSV(){
   try { agrRows = parseAGRFromCSV(await fetchCSV(AGR_GID, "AGR")); }
   catch (e) { agrError = "AGR fetch failed: " + (e.message || e); }
   // 3) Platform Ad Efficiency_Mktg tab
-  let pae = null, paeError = null;
-  try { pae = parsePAEFromCSV(await fetchCSV(PAE_GID, "PAE")); }
-  catch (e) { paeError = "PAE fetch failed: " + (e.message || e); }
+  // PAE comes once but is parsed twice — once for Privyr cols, once for Website ECF cols.
+  let paeCsv = null, paeError = null, wsPaeError = null;
+  try { paeCsv = await fetchCSV(PAE_GID, "PAE"); }
+  catch (e) { paeError = "PAE fetch failed: " + (e.message || e); wsPaeError = paeError; }
+  let pae = null, wsPae = null;
+  if (paeCsv) {
+    try { pae = parsePAEFromCSV(paeCsv, "privyr"); }
+    catch (e) { paeError = "PAE parse (Privyr) failed: " + (e.message || e); }
+    try { wsPae = parsePAEFromCSV(paeCsv, "website"); }
+    catch (e) { wsPaeError = "PAE parse (Website) failed: " + (e.message || e); }
+  }
   let summary = null, summaryError = null;
   try { summary = parseSummaryFromCSV(await fetchCSV(SUMMARY_GID, "Summary")); }
   catch (e) { summaryError = "Summary fetch failed: " + (e.message || e); }
-  return { ceRows, agrRows, agrError, pae, paeError, summary, summaryError };
+  // Website per-ad CE data + AGR Website rows for orders/revenue join
+  let wsRows = [], wsRowsError = null;
+  try {
+    const wsCsv = await fetchCSV(WS_CE_GID, "Website CE");
+    wsRows = parsePrivyrFromCSV(wsCsv); // re-uses CE-style parser (same OFFSETS layout)
+  } catch (e) { wsRowsError = "Website CE fetch failed: " + (e.message || e); }
+  return { ceRows, agrRows, agrError, pae, paeError, summary, summaryError, wsRows, wsPae, wsPaeError, wsRowsError };
 }
 
-async function load(){setStamp();applyTitleDate();const inCowork=!!(window.cowork&&typeof window.cowork.callMcpTool==="function");let bundle;try{bundle=inCowork?await loadFromCowork():await loadFromPublicCSV();}catch(err){const msg=err&&err.message?err.message:String(err);if(inCowork){showError("Couldn't load via Cowork's Drive MCP",msg);}else{showError("Couldn't fetch the published CSV",msg+"\n\nIf this is a CORS/network error in a file:// page, try a tiny local server:\n  python -m http.server 8000\nand open http://localhost:8000/privyr-creative-effectiveness.html\n\nAlso confirm the workbook is still set to File → Share → Publish to web,\nand that gid="+SHEET_GID+" is the Privyr CE tab.");}return;}const{ceRows,agrRows,agrError,pae,paeError,summary,summaryError}=bundle;if(!ceRows.length){showError("No active rows found",'The Privyr CE tab returned 0 rows where column F = "active".');return;}const agrMap=buildAGRMap(agrRows);mergeAGRIntoCE(ceRows,agrMap);state.rows=ceRows;state.totals=privyrTotals(agrRows);state.pae=pae||null;state.summary=summary||null;state.summaryError=summaryError||null;if(agrError){showError("Orders / Revenue (per-ad) not loaded",agrError+"\n\nFix: open the workbook → click the \"Ad Generated Revenue\" tab → look at the URL — the number after gid= is the value we need.","warn");}if(paeError){showError("Top-card period totals not loaded",paeError+"\n\nFix: open the workbook → click the \"Platform Ad Efficiency_Mktg\" tab → copy the number after gid= from the URL and send it to me.","warn");}if(summaryError){showError("Summary Dashboard not loaded",summaryError+"\n\nFix: open the workbook → click the \"Summary Dashboard\" tab → copy the number after gid= from the URL and send it to me.","warn");}renderTable();renderSummaryFunnel();}
+async function load(){setStamp();applyTitleDate();const inCowork=!!(window.cowork&&typeof window.cowork.callMcpTool==="function");let bundle;try{bundle=inCowork?await loadFromCowork():await loadFromPublicCSV();}catch(err){const msg=err&&err.message?err.message:String(err);if(inCowork){showError("Couldn't load via Cowork's Drive MCP",msg);}else{showError("Couldn't fetch the published CSV",msg+"\n\nIf this is a CORS/network error in a file:// page, try a tiny local server:\n  python -m http.server 8000\nand open http://localhost:8000/privyr-creative-effectiveness.html\n\nAlso confirm the workbook is still set to File → Share → Publish to web,\nand that gid="+SHEET_GID+" is the Privyr CE tab.");}return;}const{ceRows,agrRows,agrError,pae,paeError,summary,summaryError,wsRows,wsPae,wsPaeError,wsRowsError}=bundle;if(!ceRows.length){showError("No active rows found",'The Privyr CE tab returned 0 rows where column F = "active".');return;}const agrMap=buildAGRMap(agrRows);mergeAGRIntoCE(ceRows,agrMap);state.rows=ceRows;state.totals=privyrTotals(agrRows);state.pae=pae||null;state.summary=summary||null;state.summaryError=summaryError||null;
+  // Website scope: same AGR feed, but matched against website ad rows.
+  const wsAgrMap=buildAGRMap(agrRows);
+  if(wsRows && wsRows.length){ mergeAGRIntoCE(wsRows,wsAgrMap); }
+  state.website.rows = wsRows || [];
+  state.website.totals = websiteTotals(agrRows);
+  state.website.pae = wsPae || null;if(agrError){showError("Orders / Revenue (per-ad) not loaded",agrError+"\n\nFix: open the workbook → click the \"Ad Generated Revenue\" tab → look at the URL — the number after gid= is the value we need.","warn");}if(paeError){showError("Top-card period totals not loaded",paeError+"\n\nFix: open the workbook → click the \"Platform Ad Efficiency_Mktg\" tab → copy the number after gid= from the URL and send it to me.","warn");}if(summaryError){showError("Summary Dashboard not loaded",summaryError+"\n\nFix: open the workbook → click the \"Summary Dashboard\" tab → copy the number after gid= from the URL and send it to me.","warn");}
+  if(wsRowsError){showError("Website per-ad data not loaded", wsRowsError, "warn");}
+  if(wsPaeError){showError("Website ECF cards not loaded", wsPaeError, "warn");}
+  renderTable();
+  renderSummaryFunnel();
+  renderWebsiteTable();
+}
 
 // SVG icons for funnel steps (Lucide-style, currentColor, 2px stroke)
 const F_ICONS={
@@ -1702,7 +2108,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
       const matches=(c.id==='tab-'+t)||(c.dataset && c.dataset.tabId===t);
       c.classList.toggle('active',matches);
     });
-    if(t==='funnel' && section.id==='top-privyr') renderFunnel();
+    if(t==='funnel' && section.id==='top-privyr') renderFunnel(); if(t==='funnel' && section.id==='top-website') renderWebsiteFunnel();
   });
 });
 
@@ -1718,6 +2124,7 @@ document.querySelectorAll('.top-tab-btn').forEach(btn=>{
       c.classList.toggle('active',c.id==='top-'+t);
     });
     if(t==='summary') renderSummaryFunnel();
+    if(t==='website') { renderWebsiteTable(); }
   });
 });
 
