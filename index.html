@@ -197,8 +197,33 @@
   .funnel-step.revenue.clickable{cursor:pointer;transition:transform 140ms ease,box-shadow 140ms ease}
   .funnel-step.revenue.clickable:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(111,45,168,.42),inset 0 1px 0 rgba(255,255,255,.32)}
   .funnel-step.revenue.clickable::after,.funnel-step.revenue.clickable::before{pointer-events:none}
-  .funnel-step.revenue .rm-hint{position:relative;z-index:1;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;opacity:.85;margin-top:4px;display:inline-flex;align-items:center;gap:4px}
+  /* "Click to drill down" hint at the BOTTOM of the card */
+  .funnel-step.revenue .rm-hint{position:relative;z-index:1;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;opacity:.9;margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;gap:5px}
   .funnel-step.revenue .rm-hint svg{width:11px;height:11px}
+
+  /* Organic Revenue — a level darker purple */
+  .funnel-step.organic-rev{background:linear-gradient(135deg,#421475 0%,#5d2a8f 50%,#7a3eb8 100%);border:none;color:#fff;position:relative;overflow:hidden;box-shadow:0 6px 22px rgba(66,20,117,.42),inset 0 1px 0 rgba(255,255,255,.22)}
+  .funnel-step.organic-rev::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 12% -10%,rgba(255,255,255,.24) 0%,transparent 45%),radial-gradient(circle at 92% 110%,rgba(255,255,255,.08) 0%,transparent 45%);pointer-events:none;z-index:0}
+  .funnel-step.organic-rev::after{content:"";position:absolute;top:-30%;left:0;width:18%;height:160%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);transform:rotate(18deg) translateX(-50%);pointer-events:none;z-index:0}
+
+  /* Total Revenue — even darker, gilded accent */
+  .funnel-step.total-rev{background:linear-gradient(135deg,#2c0855 0%,#42166e 50%,#5a2589 100%);border:none;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 26px rgba(44,8,85,.55),inset 0 1px 0 rgba(255,255,255,.18)}
+  .funnel-step.total-rev::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 12% -10%,rgba(255,235,180,.18) 0%,transparent 45%),radial-gradient(circle at 92% 110%,rgba(255,200,90,.10) 0%,transparent 45%);pointer-events:none;z-index:0}
+  .funnel-step.total-rev::after{content:"";position:absolute;top:-30%;left:0;width:18%;height:160%;background:linear-gradient(90deg,transparent,rgba(255,220,150,.16),transparent);transform:rotate(18deg) translateX(-50%);pointer-events:none;z-index:0}
+  .funnel-step.total-rev .fs-label,
+  .funnel-step.organic-rev .fs-label{position:relative;z-index:1}
+  .funnel-step.total-rev .fs-value,
+  .funnel-step.organic-rev .fs-value{position:relative;z-index:1}
+
+  /* Two-up Orders/AOV/CAC mini-grid for Total Revenue card */
+  .rev-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;position:relative;z-index:1;margin-top:6px;padding-top:8px;border-top:1px solid rgba(255,255,255,.18)}
+  .rev-mini-grid .rmg-item .lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.78);text-transform:uppercase;letter-spacing:.04em}
+  .rev-mini-grid .rmg-item .val{font-size:14px;font-weight:800;color:#fff;margin-top:1px}
+  .rev-mini-grid.single{grid-template-columns:1fr}
+
+  /* Stack the 3 revenue cards tightly inside a column */
+  .rev-stack{display:flex;flex-direction:column;gap:8px}
+  .rev-stack .funnel-step{margin:0}
 
   /* === Revenue Modal === */
   .rev-modal{position:fixed;inset:0;display:none;z-index:9999;align-items:center;justify-content:center}
@@ -213,6 +238,7 @@
   .rm-pt-btn{border:none;background:transparent;color:#5a4670;font-weight:700;font-size:12px;padding:6px 12px;border-radius:7px;cursor:pointer;font-family:inherit;letter-spacing:.01em}
   .rm-pt-btn.active{background:#6f2da8;color:#fff;box-shadow:0 2px 6px rgba(111,45,168,.35)}
   .rm-source-tabs{display:flex;gap:4px;border-bottom:1px solid #ede5f3;margin-bottom:14px}
+  .rev-modal.locked .rm-source-tabs{display:none}
   .rm-st-btn{border:none;background:transparent;color:#5a4670;font-weight:700;font-size:13px;padding:9px 16px;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-1px}
   .rm-st-btn:hover:not(.active){color:#6f2da8}
   .rm-st-btn.active{color:#6f2da8;border-bottom-color:#6f2da8}
@@ -242,6 +268,10 @@
   .rm-slice-dot{r:3.2}
 
   /* Extra-note legend (compact, below the chart) */
+  .rm-pt-summary{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+  .rm-pt-summary .pt-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid #e3d3f3;background:#fafaff;color:#3a2552}
+  .rm-pt-summary .pt-badge .pt-sw{width:10px;height:10px;border-radius:3px}
+  .rm-pt-summary .pt-badge .pt-share{color:#6f2da8;font-weight:800;margin-left:4px}
   .rm-extra-note{margin-top:14px;padding-top:12px;border-top:1px dashed #e3d3f3}
   .rm-extra-note .ren-title{font-size:11px;font-weight:700;color:#7a6892;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
   .rm-legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 18px}
@@ -492,7 +522,7 @@
   <div class="rm-card" role="document">
     <button class="rm-close" data-rm-close="1" aria-label="Close">&times;</button>
     <div class="rm-head">
-      <div class="rm-title">Revenue Breakdown</div>
+      <div class="rm-title" id="rm-title-text">Revenue Breakdown</div>
       <div class="rm-period-tabs" role="tablist" aria-label="Period">
         <button class="rm-pt-btn active" data-period="lifetime" role="tab" aria-selected="true">Lifetime</button>
         <button class="rm-pt-btn" data-period="l30" role="tab" aria-selected="false">Last 30 days</button>
@@ -503,6 +533,7 @@
       <div class="rm-source-tabs" role="tablist" aria-label="Source">
         <button class="rm-st-btn active" data-source="paid" role="tab" aria-selected="true">Paid Media</button>
         <button class="rm-st-btn" data-source="organic" role="tab" aria-selected="false">Organic</button>
+        <button class="rm-st-btn" data-source="total" role="tab" aria-selected="false">Total</button>
       </div>
       <div class="rm-pane active" data-pane="paid">
         <div class="rm-metrics" id="rm-paid-metrics"></div>
@@ -527,6 +558,20 @@
           <div class="rm-extra-note">
             <div class="ren-title">Extra note &mdash; revenue &amp; share by channel</div>
             <div id="rm-organic-legend" class="rm-legend"></div>
+          </div>
+        </div>
+      </div>
+      <div class="rm-pane" data-pane="total">
+        <div class="rm-metrics" id="rm-total-metrics"></div>
+        <div class="rm-chart-wrap">
+          <div class="rm-chart-title">Revenue split &mdash; all channels &mdash; <span id="rm-total-period-lbl">Lifetime</span></div>
+          <div class="rm-pt-summary" id="rm-total-headline"></div>
+          <div class="rm-chart-row">
+            <div id="rm-total-pie" class="rm-pie-stage"></div>
+          </div>
+          <div class="rm-extra-note">
+            <div class="ren-title">Extra note &mdash; revenue &amp; share by channel (all 9)</div>
+            <div id="rm-total-legend" class="rm-legend"></div>
           </div>
         </div>
       </div>
@@ -893,7 +938,8 @@ function renderSummaryFunnel(){
   node.querySelectorAll('.funnel-step.revenue.clickable').forEach(box=>{
     box.addEventListener('click',()=>{
       const period = box.dataset.period || 'lifetime';
-      openRevenueModal(period);
+      const kind = box.dataset.revKind || 'paid';
+      openRevenueModal(period, kind);
     });
   });
 }
@@ -914,7 +960,9 @@ function renderSummaryFunnelColumn(sd, pk){
     {id:"bt",      icon:F_ICONS.bt,       label:"Brief Taken", value:g("bt"),          prevName:"Valid", conv:g("v2b"), costLbl:"CPBT",  cost:g("cpbt"),    fmt:fmtInt},
     {id:"hv",      icon:F_ICONS.hv,       label:"Home Visits", value:g("hv"),          prevName:"Brief", conv:g("b2h"), costLbl:"CPHV",  cost:g("cphv"),    fmt:fmtInt},
     {id:"orders",  icon:F_ICONS.orders,   label:"Orders",      value:g("perfOrders"),  prevName:"Visit", conv:null,     costLbl:"CAC",   cost:(sd.cacPerf?sd.cacPerf[pk]:null), fmt:fmtInt},
-    {id:"revenue", icon:F_ICONS.revenue,  label:"Revenue",     value:g("perfRevenue"), prevName:null,    conv:null,     costLbl:"ROAS",  cost:g("roas"),    fmt:fmtINR0, isRevenue:true}
+    {id:"paidRev",    icon:F_ICONS.revenue, label:"Paid Media Revenue", value:g("perfRevenue"),  isRevenue:true, revKind:"paid",    cost:g("roas")},
+    {id:"organicRev", icon:F_ICONS.revenue, label:"Organic Revenue",    value:g("otherRevenue"), isRevenue:true, revKind:"organic", orders:g("otherOrders")},
+    {id:"totalRev",   icon:F_ICONS.revenue, label:"Total Revenue",      value:g("totalRevenue"), isRevenue:true, revKind:"total",   orders:g("totalOrders"), aov:(sd.aovTotal?sd.aovTotal[pk]:null), cac:(sd.cacTotal?sd.cacTotal[pk]:null)}
   ];
 
   // Biggest drop calc among non-spend steps
@@ -934,7 +982,8 @@ function renderSummaryFunnelColumn(sd, pk){
         h += '<div class="funnel-connector"></div>';
       }
     }
-    if(s.id==="revenue"){
+    // Direct-to-order conversion block + connector right BEFORE the first revenue card
+    if(s.isRevenue && (i===0 || !steps[i-1].isRevenue)){
       h += '<div class="funnel-connector"></div>';
       const fmtPair = v=>{
         if(v==null||isNaN(v)) return '<span class="none">&mdash;</span>';
@@ -950,51 +999,86 @@ function renderSummaryFunnelColumn(sd, pk){
         +'</div>'
         +'</div>';
       h += '<div class="funnel-connector"></div>';
+      h += '<div class="rev-stack">';
     }
     const wcls = 's'+Math.min(i+1,5);
-    const valFmt = (s.value==null)?'&mdash;':s.fmt(s.value);
+    const valFmt = (s.value==null)?'&mdash;':(s.fmt?s.fmt(s.value):fmtINR0(s.value));
     let metaHtml = '';
+    let extraCls = '';
+    let dataAttr = '';
     if(s.isRevenue){
-      const roasFmt = (s.cost==null||isNaN(s.cost))?'&mdash;':Number(s.cost).toFixed(2)+'x';
-      metaHtml = '<div class="revenue-roas"><div class="rr-lbl">ROAS</div><div class="rr-val">'+roasFmt+'</div></div>'
-        + '<div class="rm-hint">click to drill down &rarr;</div>';
+      // Per-revenue-kind styling and meta
+      if(s.revKind==='paid'){
+        extraCls = ' revenue clickable';
+        const roasFmt = (s.cost==null||isNaN(s.cost))?'&mdash;':Number(s.cost).toFixed(2)+'x';
+        metaHtml = '<div class="revenue-roas"><div class="rr-lbl">ROAS</div><div class="rr-val">'+roasFmt+'</div></div>';
+      } else if(s.revKind==='organic'){
+        extraCls = ' revenue organic-rev clickable';
+        const ord = (s.orders==null||isNaN(s.orders))?'&mdash;':fmtInt(s.orders);
+        metaHtml = '<div class="rev-mini-grid single"><div class="rmg-item"><div class="lbl">Orders</div><div class="val">'+ord+'</div></div></div>';
+      } else if(s.revKind==='total'){
+        extraCls = ' revenue total-rev clickable';
+        const ord = (s.orders==null||isNaN(s.orders))?'&mdash;':fmtInt(s.orders);
+        const aov = (s.aov==null||isNaN(s.aov))?'&mdash;':fmtINR0(s.aov);
+        const cac = (s.cac==null||isNaN(s.cac))?'&mdash;':fmtINR0(s.cac);
+        metaHtml = '<div class="rev-mini-grid">'
+          +'<div class="rmg-item"><div class="lbl">Orders</div><div class="val">'+ord+'</div></div>'
+          +'<div class="rmg-item"><div class="lbl">AOV</div><div class="val">'+aov+'</div></div>'
+          +'<div class="rmg-item"><div class="lbl">CAC</div><div class="val">'+cac+'</div></div>'
+          +'</div>';
+      }
+      // "Click to drill down" hint at the BOTTOM
+      metaHtml += '<div class="rm-hint">click to drill down &rarr;</div>';
+      dataAttr = ' data-period="'+pk+'" data-rev-kind="'+s.revKind+'" role="button" tabindex="0" aria-label="Open '+s.label+' breakdown"';
     } else if(s.isSpend){
       metaHtml = '<div class="fs-meta"><span>Total spend (paid media)</span></div>';
+      extraCls = ' spend';
     } else {
       const convLine = (s.conv==null)?('<span>'+(i===0||i===1?'Top of funnel':'')+'</span>'):('<span class="conv">'+s.conv.toFixed(1)+'%</span> from '+s.prevName);
-      const costLine = (s.cost==null)?'':('<span class="cost">'+s.costLbl+' '+(s.id==='orders'?fmtINR0(s.cost):fmtINR0(s.cost))+'</span>');
+      const costLine = (s.cost==null)?'':('<span class="cost">'+s.costLbl+' '+fmtINR0(s.cost)+'</span>');
       metaHtml = '<div class="fs-meta">'+convLine+costLine+'</div>';
     }
-    const extraCls = s.isSpend?' spend':(s.isRevenue?' revenue clickable':'');
-    const dataAttr = s.isRevenue?(' data-period="'+pk+'" role="button" tabindex="0" aria-label="Open revenue breakdown"'):'';
     h += '<div class="funnel-step '+wcls+extraCls+'"'+dataAttr+'>'
       + '<div class="fs-icon">'+s.icon+'</div>'
       + '<div class="fs-label">'+s.label+'</div>'
       + '<div class="fs-value">'+valFmt+'</div>'
       + metaHtml
       + '</div>';
+    // Close the rev-stack wrapper after the LAST revenue card
+    if(s.isRevenue && (i===steps.length-1 || !steps[i+1].isRevenue)){
+      h += '</div>';
+    }
   });
   return h;
 }
 
 // === Revenue Modal ===
 const PAID_COLORS = ["#6f2da8","#a259d4","#d6a8f0"];
-const ORGANIC_COLORS = ["#6f2da8","#a259d4","#d6a8f0","#3a8db8","#16a34a","#dc8a16"];
+const ORGANIC_COLORS = ["#16a34a","#dc8a16","#3a8db8","#c4376b","#f59e0b","#0d9488"];
+// 9 channels: 3 paid (purple shades) + 6 organic (varied hues)
+const TOTAL_COLORS = ["#6f2da8","#a259d4","#d6a8f0","#16a34a","#dc8a16","#3a8db8","#c4376b","#f59e0b","#0d9488"];
 
 const PERIOD_LABELS = {lifetime:"Lifetime", l30:"Last 30 days", l7:"Last 7 days"};
 
 const _modalState = {period:"lifetime", source:"paid"};
 
-function openRevenueModal(period){
+function openRevenueModal(period, source){
   _modalState.period = period || "lifetime";
-  _modalState.source = "paid";
+  _modalState.source = source || "paid";
   const m = el('rev-modal'); if(!m) return;
-  // Set period button active
+  // Title reflects the locked source
+  const title = el('rm-title-text');
+  if(title){
+    const map = {paid:"Paid Media Revenue", organic:"Organic Revenue", total:"Total Revenue"};
+    title.textContent = map[_modalState.source] || "Revenue Breakdown";
+  }
+  // Period buttons
   m.querySelectorAll('.rm-pt-btn').forEach(b=>{
     const on = b.dataset.period === _modalState.period;
     b.classList.toggle('active', on);
     b.setAttribute('aria-selected', on?'true':'false');
   });
+  // Source tabs (hidden in locked mode but kept consistent)
   m.querySelectorAll('.rm-st-btn').forEach(b=>{
     const on = b.dataset.source === _modalState.source;
     b.classList.toggle('active', on);
@@ -1003,6 +1087,8 @@ function openRevenueModal(period){
   m.querySelectorAll('.rm-pane').forEach(p=>{
     p.classList.toggle('active', p.dataset.pane === _modalState.source);
   });
+  // Lock the modal to a single source — no Paid/Organic/Total tabs to switch
+  m.classList.add('locked');
   renderRevenueModal();
   m.classList.add('open');
   m.setAttribute('aria-hidden','false');
@@ -1012,6 +1098,7 @@ function openRevenueModal(period){
 function closeRevenueModal(){
   const m = el('rev-modal'); if(!m) return;
   m.classList.remove('open');
+  m.classList.remove('locked');
   m.setAttribute('aria-hidden','true');
   document.body.style.overflow = '';
 }
@@ -1060,6 +1147,40 @@ function renderRevenueModal(){
   ];
   el('rm-organic-period-lbl').textContent = pLbl;
   drawPie(el('rm-organic-pie'), el('rm-organic-legend'), organicSegs, ORGANIC_COLORS, get("otherRevenue"));
+
+  // Total: 9-channel pie + headline (Paid vs Organic share)
+  const totalMetrics = [
+    {lbl:"Total Orders", val:get("totalOrders"), fmt:fmtInt},
+    {lbl:"Total Revenue", val:get("totalRevenue"), fmt:fmtINR0},
+    {lbl:"AOV", val:get("aovTotal"), fmt:fmtINR0},
+    {lbl:"CAC", val:get("cacTotal"), fmt:fmtINR0}
+  ];
+  el('rm-total-metrics').innerHTML = totalMetrics.map(m=>'<div class="rm-metric"><div class="rmm-lbl">'+m.lbl+'</div><div class="rmm-val'+(m.val==null||isNaN(m.val)?' muted':'')+'">'+(m.val==null||isNaN(m.val)?'&mdash;':m.fmt(m.val))+'</div></div>').join('');
+
+  const totalSegs = [
+    {name:"Privyr",            value:get("privyrRevenue")},
+    {name:"Website",           value:get("websiteRevenue")},
+    {name:"DoubleTick",        value:get("dtRevenue")},
+    {name:"First Degree",      value:get("fdRevenue")},
+    {name:"Designer",          value:get("desRevenue")},
+    {name:"Society Group Act.", value:get("sgaRevenue")},
+    {name:"Society Standee",   value:get("ssaRevenue")},
+    {name:"Word of Mouth",     value:get("womRevenue")},
+    {name:"Social Media DM",   value:get("smdmRevenue")}
+  ];
+  el('rm-total-period-lbl').textContent = pLbl;
+  drawPie(el('rm-total-pie'), el('rm-total-legend'), totalSegs, TOTAL_COLORS, get("totalRevenue"));
+
+  // Headline: Paid vs Organic share badges
+  const totalRev = get("totalRevenue") || 0;
+  const paidRev = get("perfRevenue") || 0;
+  const orgRev = get("otherRevenue") || 0;
+  const fmtBadge = (lbl, color, val)=>{
+    const share = (totalRev>0 && val>0) ? (val/totalRev*100).toFixed(1)+"%" : "—";
+    const valStr = (val==null||isNaN(val))?'&mdash;':fmtINR0(val);
+    return '<div class="pt-badge"><span class="pt-sw" style="background:'+color+'"></span>'+lbl+': <strong>'+valStr+'</strong><span class="pt-share">&middot; '+share+'</span></div>';
+  };
+  el('rm-total-headline').innerHTML = fmtBadge("Paid Media", "#6f2da8", paidRev) + fmtBadge("Organic", "#dc8a16", orgRev);
 }
 
 function drawPie(pieNode, legendNode, segments, colors, totalOverride){
