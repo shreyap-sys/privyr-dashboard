@@ -290,8 +290,9 @@
 
   /* External slice labels (rendered as SVG <text>) */
   .rm-slice-label .lbl-name{font-size:15px;font-weight:700;fill:#3a2552;letter-spacing:.005em}
-  .rm-slice-label .lbl-val{font-size:15px;font-weight:800;fill:#3a2552}
-  .rm-slice-label .lbl-pct{font-size:14px;font-weight:800;fill:#6f2da8}
+  .rm-slice-label .lbl-val{font-size:14px;font-weight:800;fill:#3a2552}
+  .rm-slice-label .lbl-pct{font-size:13px;font-weight:800;fill:#6f2da8}
+  .rm-slice-label .lbl-orders{font-size:12px;font-weight:600;fill:#5a4670;letter-spacing:.005em}
   .rm-slice-leader{stroke-width:1.6;fill:none;opacity:.85}
   .rm-slice-dot{r:3.2}
 
@@ -302,8 +303,9 @@
   .rm-pt-summary .pt-badge .pt-share{color:#6f2da8;font-weight:800;margin-left:4px}
   .rm-extra-note{margin-top:14px;padding-top:12px;border-top:1px dashed #e3d3f3}
   .rm-extra-note .ren-title{font-size:11px;font-weight:700;color:#7a6892;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-  .rm-legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 18px}
-  .rm-legend .rml-row{display:grid;grid-template-columns:12px 1fr auto auto;gap:8px;align-items:center;font-size:12px}
+  .rm-legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px 18px}
+  .rm-legend .rml-row{display:grid;grid-template-columns:12px minmax(0,1fr) auto auto auto;gap:8px;align-items:center;font-size:12px}
+  .rm-legend .rml-orders{color:#7a6892;font-weight:600;text-align:right;white-space:nowrap;font-size:11.5px}
   .rm-legend .rml-sw{width:12px;height:12px;border-radius:3px}
   .rm-legend .rml-name{color:#3a2552;font-weight:600}
   .rm-legend .rml-val{color:#5a4670;font-weight:700;text-align:right}
@@ -1210,15 +1212,15 @@ function renderRevenueModal(){
   el('rm-total-metrics').innerHTML = totalMetrics.map(m=>'<div class="rm-metric"><div class="rmm-lbl">'+m.lbl+'</div><div class="rmm-val'+(m.val==null||isNaN(m.val)?' muted':'')+'">'+(m.val==null||isNaN(m.val)?'&mdash;':m.fmt(m.val))+'</div></div>').join('');
 
   const totalSegs = [
-    {name:"Privyr",            value:get("privyrRevenue")},
-    {name:"Website",           value:get("websiteRevenue")},
-    {name:"DoubleTick",        value:get("dtRevenue")},
-    {name:"First Degree",      value:get("fdRevenue")},
-    {name:"Designer",          value:get("desRevenue")},
-    {name:"Society Group Act.", value:get("sgaRevenue")},
-    {name:"Society Standee",   value:get("ssaRevenue")},
-    {name:"Word of Mouth",     value:get("womRevenue")},
-    {name:"Social Media DM",   value:get("smdmRevenue")}
+    {name:"Privyr",            orders:get("privyrOrders"),  value:get("privyrRevenue")},
+    {name:"Website",           orders:get("websiteOrders"), value:get("websiteRevenue")},
+    {name:"DoubleTick",        orders:get("dtOrders"),      value:get("dtRevenue")},
+    {name:"First Degree",      orders:get("fdOrders"),      value:get("fdRevenue")},
+    {name:"Designer",          orders:get("desOrders"),     value:get("desRevenue")},
+    {name:"Society Group Act.", orders:get("sgaOrders"),    value:get("sgaRevenue")},
+    {name:"Society Standee",   orders:get("ssaOrders"),     value:get("ssaRevenue")},
+    {name:"Word of Mouth",     orders:get("womOrders"),     value:get("womRevenue")},
+    {name:"Social Media DM",   orders:get("smdmOrders"),    value:get("smdmRevenue")}
   ];
   el('rm-total-period-lbl').textContent = pLbl;
   drawPie(el('rm-total-pie'), el('rm-total-legend'), totalSegs, TOTAL_COLORS, get("totalRevenue"));
@@ -1284,7 +1286,9 @@ function drawPie(pieNode, legendNode, segments, colors, totalOverride){
 
   // Render slices
   segMeta.forEach(m=>{
-    svg += '<path d="'+m.d+'" fill="'+m.color+'" fill-rule="evenodd"><title>'+escapeHtml(m.s.name)+': '+fmtINR0(m.s.value||0)+' ('+(m.frac*100).toFixed(1)+'%)</title></path>';
+    const ordVal2 = (m.s.orders==null||isNaN(m.s.orders)) ? null : Math.round(m.s.orders);
+    const ordTip = ordVal2==null ? '' : (' — '+(ordVal2===1?'1 order':ordVal2+' orders'));
+    svg += '<path d="'+m.d+'" fill="'+m.color+'" fill-rule="evenodd"><title>'+escapeHtml(m.s.name)+': '+fmtINR0(m.s.value||0)+' ('+(m.frac*100).toFixed(1)+'%)'+ordTip+'</title></path>';
   });
 
   // Render external labels with leader lines and anti-collision on the y axis.
@@ -1302,7 +1306,7 @@ function drawPie(pieNode, legendNode, segments, colors, totalOverride){
     return {m, ax, ay, isRight, elbowX, elbowY, textX, textY};
   });
   // Anti-collision: split into right/left, sort by Y, stack with min spacing.
-  const SPACING = 46;
+  const SPACING = 60;
   const rightLabels = labelInfos.filter(L=>L.isRight).sort((a,b)=>a.textY-b.textY);
   const leftLabels = labelInfos.filter(L=>!L.isRight).sort((a,b)=>a.textY-b.textY);
   const fixStack = (arr)=>{
@@ -1348,9 +1352,12 @@ function drawPie(pieNode, legendNode, segments, colors, totalOverride){
     const anchor = L.isRight ? 'start' : 'end';
     const valStr = fmtINR0(m.s.value||0);
     const pctStr = (m.frac*100).toFixed(1)+'%';
+    const ordVal = (m.s.orders==null||isNaN(m.s.orders)) ? null : Math.round(m.s.orders);
+    const ordersStr = (ordVal==null) ? '' : (ordVal===1 ? '1 order' : (ordVal+' orders'));
     svg += '<g class="rm-slice-label" text-anchor="'+anchor+'">'
-      + '<text class="lbl-name" x="'+tx+'" y="'+(ty-9)+'">'+escapeHtml(m.s.name)+'</text>'
-      + '<text class="lbl-val"  x="'+tx+'" y="'+(ty+13)+'">'+valStr+' &middot; <tspan class="lbl-pct">'+pctStr+'</tspan></text>'
+      + '<text class="lbl-name" x="'+tx+'" y="'+(ty-18)+'">'+escapeHtml(m.s.name)+'</text>'
+      + '<text class="lbl-val"  x="'+tx+'" y="'+(ty+0)+'">'+valStr+' &middot; <tspan class="lbl-pct">'+pctStr+'</tspan></text>'
+      + '<text class="lbl-orders" x="'+tx+'" y="'+(ty+17)+'">'+ordersStr+'</text>'
       + '</g>';
   });
 
@@ -1362,7 +1369,9 @@ function drawPie(pieNode, legendNode, segments, colors, totalOverride){
   legendNode.innerHTML = valid.map((s,i)=>{
     const pct = total>0 ? (s._v/total*100) : 0;
     const valStr = (s.value==null||isNaN(s.value))?'&mdash;':fmtINR0(s.value);
-    return '<div class="rml-row"><span class="rml-sw" style="background:'+colors[i%colors.length]+'"></span><span class="rml-name">'+escapeHtml(s.name)+'</span><span class="rml-val">'+valStr+'</span><span class="rml-pct">'+pct.toFixed(1)+'%</span></div>';
+    const ordV = (s.orders==null||isNaN(s.orders))?null:Math.round(s.orders);
+    const ordStr = ordV==null?'':(ordV===1?'1 order':(ordV+' orders'));
+    return '<div class="rml-row"><span class="rml-sw" style="background:'+colors[i%colors.length]+'"></span><span class="rml-name">'+escapeHtml(s.name)+'</span><span class="rml-orders">'+ordStr+'</span><span class="rml-val">'+valStr+'</span><span class="rml-pct">'+pct.toFixed(1)+'%</span></div>';
   }).join('');
 }
 
