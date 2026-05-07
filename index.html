@@ -144,6 +144,8 @@
   .funnel-step.revenue .revenue-roas .rr-lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,0.78);font-weight:700;margin-bottom:3px;line-height:1}
   .funnel-step.revenue .revenue-roas .rr-val{font-size:22px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-0.01em;line-height:1;text-shadow:0 0 14px rgba(255,255,255,0.35),0 1px 2px rgba(0,0,0,0.15)}
   .funnel-empty{text-align:center;padding:60px 24px;color:var(--ink-muted);font-size:13px}
+  /* Subtle date suffix in the dashboard H1 */
+  #dashboard-title .title-date{font-size:.62em;font-weight:600;color:#7a6892;letter-spacing:.005em;margin-left:8px;vertical-align:middle}
   .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
   .chip{border:1px solid var(--line);background:var(--panel);color:var(--ink-soft);padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;cursor:pointer;user-select:none;transition:all 120ms ease}
   .chip:hover{border-color:var(--accent-soft);color:var(--ink)}
@@ -317,7 +319,7 @@
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <h1>India Meta Paid Ads Dashboard</h1>
+      <h1 id="dashboard-title">India Meta Paid Ads Dashboard</h1>
       <div class="sub">D'Moksha · India Meta Campaigns Weekly Tracker</div>
     </div>
     <div class="meta">
@@ -620,6 +622,7 @@ const SHEET_GID="825204121"; // Creative Effectiveness_Privyr
 const AGR_GID="497381798"; // Ad Generated Revenue
 const PAE_GID="1240428045"; // Platform Ad Efficiency_Mktg
 const SUMMARY_GID="1164859268"; // Summary Dashboard
+const README_GID="1292439970"; // README tab (date in A15)
 const CSV_URL=PUB_BASE+"?output=csv&gid="+SHEET_GID;
 const AGR_TAB_NAME="Ad Generated Revenue";
 const PAE_TAB_NAME="Platform Ad Efficiency_Mktg";
@@ -1501,6 +1504,40 @@ function renderTable(){
 document.querySelectorAll("#chips .chip").forEach(b=>{b.addEventListener("click",()=>{state.filter=b.dataset.filter;localStorage.setItem(STORAGE_KEY+":filter",state.filter);renderTable();});});
 document.querySelectorAll("#dt thead th.sortable").forEach(th=>{th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sort.key===k)state.sort.dir=state.sort.dir==="asc"?"desc":"asc";else{state.sort.key=k;state.sort.dir="asc";}localStorage.setItem(STORAGE_KEY+":sort",JSON.stringify(state.sort));if(summaryError){showError("Summary Dashboard not loaded",summaryError+"\n\nFix: open the workbook → click the \"Summary Dashboard\" tab → copy the number after gid= from the URL and send it to me.","warn");}renderTable();renderSummaryFunnel();});});
 
+// Pulls A15 of the README tab to display next to the dashboard title.
+// In Cowork: parses the natural-language Drive content for the date-range pattern.
+// In standalone (Render): fetches the published CSV by gid and reads row 15 col A.
+async function fetchReadmeDate(){
+  try {
+    if(window.cowork && typeof window.cowork.callMcpTool === "function"){
+      const resp = await window.cowork.callMcpTool(DRIVE_TOOL,{fileId:FILE_ID});
+      const content = extractFileContent(resp);
+      if(!content) return null;
+      // README sits at the very top of the natural-language content.
+      // A15 contains the date range like "1st Aug 2025 - 3rd May 2026".
+      const m = content.match(/\d+(?:st|nd|rd|th) [A-Z][a-z]+ \d{4} - \d+(?:st|nd|rd|th) [A-Z][a-z]+ \d{4}/);
+      return m ? m[0] : null;
+    }
+    const url = PUB_BASE+"?output=csv&gid="+README_GID+"&_="+Date.now();
+    const r = await fetch(url, {cache:"no-store"});
+    if(!r.ok) return null;
+    const txt = await r.text();
+    const rows = parseCSV(txt);
+    if(rows.length < 15) return null;
+    const v = (rows[14] && rows[14][0]) ? String(rows[14][0]).trim() : "";
+    return v || null;
+  } catch(e) { return null; }
+}
+
+async function applyTitleDate(){
+  const d = await fetchReadmeDate();
+  if(!d) return;
+  const t = el('dashboard-title');
+  if(!t) return;
+  // Preserve the original heading text and append the date in muted parens.
+  t.innerHTML = 'India Meta Paid Ads Dashboard <span class="title-date">('+escapeHtml(d)+')</span>';
+}
+
 async function loadFromCowork(){const resp=await window.cowork.callMcpTool(DRIVE_TOOL,{fileId:FILE_ID});const content=extractFileContent(resp);if(!content||content.length<1000)throw new Error("Drive MCP returned empty / truncated content.");let summary=null,summaryError=null;try{summary=parseSummaryFromNL(content);}catch(e){summaryError=e&&e.message?e.message:String(e);}return{ceRows:parsePrivyrFromNL(content),agrRows:parseAGRFromNL(content),pae:parsePAEFromNL(content),summary,summaryError};}
 
 async function discoverGidForTab(tabName){let html="";try{const r=await fetch(PUBHTML_URL,{method:"GET",cache:"no-store"});if(!r.ok)return null;html=await r.text();}catch(e){return null;}if(!html)return null;const escaped=tabName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const patterns=[new RegExp('"name":"'+escaped+'"\\s*,\\s*"gid":"?(\\d+)','i'),new RegExp('"gid":"?(\\d+)"?\\s*,\\s*"name":"'+escaped+'"','i'),new RegExp('id="sheet-button-(\\d+)"[^>]*>[^<]*'+escaped,'i'),new RegExp('gid=(\\d+)[^>]*>[^<]*'+escaped,'i')];for(const re of patterns){const m=re.exec(html);if(m&&m[1])return m[1];}return null;}
@@ -1532,7 +1569,7 @@ async function loadFromPublicCSV(){
   return { ceRows, agrRows, agrError, pae, paeError, summary, summaryError };
 }
 
-async function load(){setStamp();const inCowork=!!(window.cowork&&typeof window.cowork.callMcpTool==="function");let bundle;try{bundle=inCowork?await loadFromCowork():await loadFromPublicCSV();}catch(err){const msg=err&&err.message?err.message:String(err);if(inCowork){showError("Couldn't load via Cowork's Drive MCP",msg);}else{showError("Couldn't fetch the published CSV",msg+"\n\nIf this is a CORS/network error in a file:// page, try a tiny local server:\n  python -m http.server 8000\nand open http://localhost:8000/privyr-creative-effectiveness.html\n\nAlso confirm the workbook is still set to File → Share → Publish to web,\nand that gid="+SHEET_GID+" is the Privyr CE tab.");}return;}const{ceRows,agrRows,agrError,pae,paeError,summary,summaryError}=bundle;if(!ceRows.length){showError("No active rows found",'The Privyr CE tab returned 0 rows where column F = "active".');return;}const agrMap=buildAGRMap(agrRows);mergeAGRIntoCE(ceRows,agrMap);state.rows=ceRows;state.totals=privyrTotals(agrRows);state.pae=pae||null;state.summary=summary||null;state.summaryError=summaryError||null;if(agrError){showError("Orders / Revenue (per-ad) not loaded",agrError+"\n\nFix: open the workbook → click the \"Ad Generated Revenue\" tab → look at the URL — the number after gid= is the value we need.","warn");}if(paeError){showError("Top-card period totals not loaded",paeError+"\n\nFix: open the workbook → click the \"Platform Ad Efficiency_Mktg\" tab → copy the number after gid= from the URL and send it to me.","warn");}if(summaryError){showError("Summary Dashboard not loaded",summaryError+"\n\nFix: open the workbook → click the \"Summary Dashboard\" tab → copy the number after gid= from the URL and send it to me.","warn");}renderTable();renderSummaryFunnel();}
+async function load(){setStamp();applyTitleDate();const inCowork=!!(window.cowork&&typeof window.cowork.callMcpTool==="function");let bundle;try{bundle=inCowork?await loadFromCowork():await loadFromPublicCSV();}catch(err){const msg=err&&err.message?err.message:String(err);if(inCowork){showError("Couldn't load via Cowork's Drive MCP",msg);}else{showError("Couldn't fetch the published CSV",msg+"\n\nIf this is a CORS/network error in a file:// page, try a tiny local server:\n  python -m http.server 8000\nand open http://localhost:8000/privyr-creative-effectiveness.html\n\nAlso confirm the workbook is still set to File → Share → Publish to web,\nand that gid="+SHEET_GID+" is the Privyr CE tab.");}return;}const{ceRows,agrRows,agrError,pae,paeError,summary,summaryError}=bundle;if(!ceRows.length){showError("No active rows found",'The Privyr CE tab returned 0 rows where column F = "active".');return;}const agrMap=buildAGRMap(agrRows);mergeAGRIntoCE(ceRows,agrMap);state.rows=ceRows;state.totals=privyrTotals(agrRows);state.pae=pae||null;state.summary=summary||null;state.summaryError=summaryError||null;if(agrError){showError("Orders / Revenue (per-ad) not loaded",agrError+"\n\nFix: open the workbook → click the \"Ad Generated Revenue\" tab → look at the URL — the number after gid= is the value we need.","warn");}if(paeError){showError("Top-card period totals not loaded",paeError+"\n\nFix: open the workbook → click the \"Platform Ad Efficiency_Mktg\" tab → copy the number after gid= from the URL and send it to me.","warn");}if(summaryError){showError("Summary Dashboard not loaded",summaryError+"\n\nFix: open the workbook → click the \"Summary Dashboard\" tab → copy the number after gid= from the URL and send it to me.","warn");}renderTable();renderSummaryFunnel();}
 
 // SVG icons for funnel steps (Lucide-style, currentColor, 2px stroke)
 const F_ICONS={
@@ -1729,3 +1766,4 @@ load();
 </script>
 </body>
 </html>
+                                                                                                                                                                                                                                                                                                                            
