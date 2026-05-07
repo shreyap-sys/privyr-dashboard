@@ -196,6 +196,11 @@
   .pill.rose{background:var(--rose-bg);color:var(--rose-ink)}
   .pill.amber{background:var(--amber-bg);color:var(--amber-ink)}
   .pill.neutral{background:var(--neutral-bg);color:var(--ink-soft)}
+  /* Meta Learning emphasis */
+  .pill.sage.ml-pass{font-weight:800;letter-spacing:.01em}
+  .pill.rose.ml-fail{font-weight:800;letter-spacing:.01em}
+  .ml-warn{color:#dc2626;font-weight:700}
+  .ml-warn .ml-num{color:#b91c1c;font-weight:900;font-size:1.05em}
   .info-row td.info{padding:10px 14px;font-size:12.5px;color:var(--ink-soft)}
   .info-row .lbl{display:inline-block;min-width:162px;font-weight:600;color:var(--ink);margin-right:8px;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
   .info-row .detail{color:var(--ink-soft)}
@@ -1565,7 +1570,7 @@ function pill(value,kind,formatter){if(value==null||isNaN(value))return '<span c
 const ctrPill=v=>pill(v,(v!=null&&v>=1)?"sage":(v==null?"neutral":"rose"),fmtPct);
 const cplPill=v=>pill(v,(v!=null&&v<=150)?"sage":(v==null?"neutral":"rose"),fmtINR0);
 
-function metaLearning(r){const wkLeads=r.l7.leads;if(wkLeads==null){return{html:'<span class="pill neutral">No L7 data</span>',detail:"Last 7 days has no recorded leads — cannot evaluate."};}const passed=wkLeads>=META_LEARNING_THRESHOLD;const tag=passed?'<span class="pill sage">Passed</span>':'<span class="pill amber">Learning</span>';const gap=Math.max(0,META_LEARNING_THRESHOLD-wkLeads);const detail=passed?'<span class="strong">'+fmtInt(wkLeads)+'</span> leads in last 7 days · already past Meta\'s '+META_LEARNING_THRESHOLD+'/wk threshold.':'<span class="strong">'+fmtInt(wkLeads)+'</span> leads in last 7 days · <span class="strong">'+fmtInt(gap)+'</span> more needed to exit Learning.';return{html:tag,detail};}
+function metaLearning(r){const wkLeads=r.l7.leads;if(wkLeads==null){return{html:'<span class="pill neutral">No L7 data</span>',detail:"Last 7 days has no recorded leads — cannot evaluate."};}const passed=wkLeads>=META_LEARNING_THRESHOLD;const tag=passed?'<span class="pill sage ml-pass">Learning exited</span>':'<span class="pill rose ml-fail">Learning Limited</span>';const gap=Math.max(0,META_LEARNING_THRESHOLD-wkLeads);const detail=passed?'<span class="strong">'+fmtInt(wkLeads)+'</span> leads in last 7 days · already past Meta\'s '+META_LEARNING_THRESHOLD+'/wk threshold.':'<span class="strong">'+fmtInt(wkLeads)+'</span> leads in last 7 days · <span class="ml-warn"><strong class="ml-num">'+fmtInt(gap)+'</strong> more needed to exit Learning.</span>';return{html:tag,detail};}
 
 function recommendedBudget(r){let cpl=r.l30.cpl,basis="Last 30 days";if(cpl==null||isNaN(cpl)||cpl<=0){cpl=r.lifetime.cpl;basis="Lifetime (L30 had no leads)";}if(cpl==null||isNaN(cpl)||cpl<=0){return{html:'<span class="pill neutral">—</span>',detail:"No CPL available to compute a recommendation."};}const weekly=META_LEARNING_THRESHOLD*cpl;const daily=weekly/7;const tag='<span class="pill neutral">'+fmtINR0(weekly)+'/wk</span>';const detail='<span class="strong">'+fmtINR0(weekly)+'/wk</span> &nbsp;·&nbsp; <span class="strong">'+fmtINR0(daily)+'/day</span> &nbsp;to hit '+META_LEARNING_THRESHOLD+' leads/week at '+basis+' CPL <span class="strong">'+fmtINR0(cpl)+'</span>.';return{html:tag,detail};}
 
