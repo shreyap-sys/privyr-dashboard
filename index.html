@@ -127,6 +127,12 @@
   .rev-secondary.grid-2x2 .metric + .metric{padding-left:0;border-left:none}
   .rev-secondary.grid-2x2 .metric .lbl{font-size:9.5px;color:rgba(255,255,255,.74)}
   .rev-secondary.grid-2x2 .metric .val{font-size:15px;font-weight:800}
+  /* 2-column variant for Organic Revenue (Orders + AOV side-by-side) */
+  .rev-secondary.grid-2x1{display:grid;grid-template-columns:auto auto;gap:0 26px;justify-content:center;align-items:start;flex-wrap:nowrap}
+  .rev-secondary.grid-2x1 .metric{display:flex;flex-direction:column;align-items:center;gap:1px}
+  .rev-secondary.grid-2x1 .metric + .metric{padding-left:0;border-left:none}
+  .rev-secondary.grid-2x1 .metric .lbl{font-size:9.5px;color:rgba(255,255,255,.74)}
+  .rev-secondary.grid-2x1 .metric .val{font-size:15px;font-weight:800}
   /* Big revenue amount */
   .funnel-step.revenue .fs-value{color:#fff;font-size:30px;font-weight:800;line-height:1.05;letter-spacing:-.01em;text-shadow:0 1px 2px rgba(0,0,0,.18);text-align:center;min-width:auto;padding:0;margin:2px 0 4px}
   /* Bolder click-to-drill-down at the BOTTOM */
@@ -982,7 +988,7 @@ function renderSummaryFunnelColumn(sd, pk){
     {id:"bt",      icon:F_ICONS.bt,       label:"Brief Taken", value:g("bt"),          prevName:"Valid", conv:g("v2b"), costLbl:"CPBT",  cost:g("cpbt"),    fmt:fmtInt},
     {id:"hv",      icon:F_ICONS.hv,       label:"Home Visits", value:g("hv"),          prevName:"Brief", conv:g("b2h"), costLbl:"CPHV",  cost:g("cphv"),    fmt:fmtInt},
     {id:"paidRev",    icon:F_ICONS.revenue, label:"Paid Media Revenue", value:g("perfRevenue"),  isRevenue:true, revKind:"paid",    cost:g("roas"), orders:g("perfOrders"), aov:(sd.aovPerf?sd.aovPerf[pk]:null), cac:(sd.cacPerf?sd.cacPerf[pk]:null)},
-    {id:"organicRev", icon:F_ICONS.revenue, label:"Organic Revenue",    value:g("otherRevenue"), isRevenue:true, revKind:"organic", orders:g("otherOrders")},
+    {id:"organicRev", icon:F_ICONS.revenue, label:"Organic Revenue",    value:g("otherRevenue"), isRevenue:true, revKind:"organic", orders:g("otherOrders"), aov:((g("otherOrders")&&g("otherOrders")>0&&g("otherRevenue")!=null)?(g("otherRevenue")/g("otherOrders")):null)},
     {id:"totalRev",   icon:F_ICONS.revenue, label:"Total Revenue",      value:g("totalRevenue"), isRevenue:true, revKind:"total",   orders:g("totalOrders"), aov:(sd.aovTotal?sd.aovTotal[pk]:null), cac:(sd.cacTotal?sd.cacTotal[pk]:null)}
   ];
 
@@ -1031,7 +1037,11 @@ function renderSummaryFunnelColumn(sd, pk){
       } else if(s.revKind==='organic'){
         extraCls = ' revenue organic-rev clickable';
         const ord = (s.orders==null||isNaN(s.orders))?'&mdash;':fmtInt(s.orders);
-        secondary = '<div class="rev-secondary"><span class="metric"><span class="lbl">Orders</span> <span class="val">'+ord+'</span></span></div>';
+        const aov = (s.aov==null||isNaN(s.aov))?'&mdash;':fmtINR0(s.aov);
+        secondary = '<div class="rev-secondary grid-2x1">'
+          +'<span class="metric"><span class="lbl">Orders</span><span class="val">'+ord+'</span></span>'
+          +'<span class="metric"><span class="lbl">AOV</span><span class="val">'+aov+'</span></span>'
+          +'</div>';
       } else if(s.revKind==='total'){
         extraCls = ' revenue total-rev clickable';
         const ord = (s.orders==null||isNaN(s.orders))?'&mdash;':fmtInt(s.orders);
