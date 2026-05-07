@@ -226,20 +226,31 @@
   .rm-chart-wrap{background:#faf7fd;border:1px solid #ede5f3;border-radius:12px;padding:14px 16px}
   .rm-chart-title{font-size:13px;font-weight:700;color:#3a2552;margin-bottom:10px}
   .rm-chart-title span{color:#6f2da8}
-  .rm-chart-row{display:grid;grid-template-columns:200px 1fr;gap:18px;align-items:center}
-  @media (max-width:560px){.rm-chart-row{grid-template-columns:1fr;justify-items:center}}
-  .rm-pie{position:relative;width:200px;height:200px}
-  .rm-pie svg{width:100%;height:100%}
-  .rm-pie .rmp-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-  .rm-pie .rmp-c-lbl{font-size:10px;font-weight:700;color:#7a6892;text-transform:uppercase;letter-spacing:.05em}
-  .rm-pie .rmp-c-val{font-size:18px;font-weight:800;color:#3a2552;margin-top:2px}
-  .rm-legend{display:flex;flex-direction:column;gap:7px}
-  .rm-legend .rml-row{display:grid;grid-template-columns:14px 1fr auto auto;gap:10px;align-items:center;font-size:13px}
-  .rm-legend .rml-sw{width:14px;height:14px;border-radius:4px}
+  .rm-chart-row{display:flex;justify-content:center;padding:8px 0 12px}
+  .rm-pie-stage{position:relative;width:560px;max-width:100%;aspect-ratio:1.8/1}
+  .rm-pie-stage svg{width:100%;height:100%;overflow:visible}
+  .rm-pie-stage .rmp-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+  .rm-pie-stage .rmp-c-lbl{font-size:11px;font-weight:700;color:#7a6892;text-transform:uppercase;letter-spacing:.05em}
+  .rm-pie-stage .rmp-c-val{font-size:22px;font-weight:800;color:#3a2552;margin-top:2px}
+  @media (max-width:680px){.rm-pie-stage{width:100%;aspect-ratio:1.4/1}}
+
+  /* External slice labels (rendered as SVG <text>) */
+  .rm-slice-label .lbl-name{font-size:12px;font-weight:700;fill:#3a2552}
+  .rm-slice-label .lbl-val{font-size:13px;font-weight:800;fill:#3a2552}
+  .rm-slice-label .lbl-pct{font-size:11px;font-weight:700;fill:#6f2da8}
+  .rm-slice-leader{stroke-width:1.4;fill:none}
+  .rm-slice-dot{r:2.6}
+
+  /* Extra-note legend (compact, below the chart) */
+  .rm-extra-note{margin-top:14px;padding-top:12px;border-top:1px dashed #e3d3f3}
+  .rm-extra-note .ren-title{font-size:11px;font-weight:700;color:#7a6892;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+  .rm-legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 18px}
+  .rm-legend .rml-row{display:grid;grid-template-columns:12px 1fr auto auto;gap:8px;align-items:center;font-size:12px}
+  .rm-legend .rml-sw{width:12px;height:12px;border-radius:3px}
   .rm-legend .rml-name{color:#3a2552;font-weight:600}
   .rm-legend .rml-val{color:#5a4670;font-weight:700;text-align:right}
-  .rm-legend .rml-pct{color:#6f2da8;font-weight:800;text-align:right;min-width:46px}
-  .rm-legend .rml-empty{color:#a99cba;font-style:italic;font-size:12px;padding:6px 0}
+  .rm-legend .rml-pct{color:#6f2da8;font-weight:800;text-align:right;min-width:42px}
+  .rm-legend .rml-empty{color:#a99cba;font-style:italic;font-size:12px;padding:6px 0;grid-column:1/-1}
 </style>
 </head>
 <body>
@@ -498,7 +509,10 @@
         <div class="rm-chart-wrap">
           <div class="rm-chart-title">Revenue split &mdash; <span id="rm-paid-period-lbl">Lifetime</span></div>
           <div class="rm-chart-row">
-            <div id="rm-paid-pie" class="rm-pie"></div>
+            <div id="rm-paid-pie" class="rm-pie-stage"></div>
+          </div>
+          <div class="rm-extra-note">
+            <div class="ren-title">Extra note &mdash; revenue &amp; share by channel</div>
             <div id="rm-paid-legend" class="rm-legend"></div>
           </div>
         </div>
@@ -508,7 +522,10 @@
         <div class="rm-chart-wrap">
           <div class="rm-chart-title">Revenue split &mdash; <span id="rm-organic-period-lbl">Lifetime</span></div>
           <div class="rm-chart-row">
-            <div id="rm-organic-pie" class="rm-pie"></div>
+            <div id="rm-organic-pie" class="rm-pie-stage"></div>
+          </div>
+          <div class="rm-extra-note">
+            <div class="ren-title">Extra note &mdash; revenue &amp; share by channel</div>
             <div id="rm-organic-legend" class="rm-legend"></div>
           </div>
         </div>
@@ -1047,50 +1064,128 @@ function renderRevenueModal(){
 
 function drawPie(pieNode, legendNode, segments, colors, totalOverride){
   if(!pieNode||!legendNode) return;
-  // Filter zero/null segments for the visual but show all in legend (with 0)
   const valid = segments.map(s=>({...s, _v: (s.value==null||isNaN(s.value)||s.value<=0)?0:s.value}));
   const total = (totalOverride!=null && !isNaN(totalOverride) && totalOverride>0) ? totalOverride : valid.reduce((a,b)=>a+b._v,0);
-  // Build SVG donut
-  const cx=100, cy=100, r=80, ir=52;
-  let svg = '<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Revenue breakdown pie">';
-  if(total <= 0){
-    // Empty ring
-    svg += '<circle cx="100" cy="100" r="80" fill="#ede5f3"/>';
-    svg += '<circle cx="100" cy="100" r="52" fill="#fff"/>';
-  } else {
-    let acc = 0;
-    valid.forEach((s,i)=>{
-      if(s._v <= 0) return;
-      const frac = s._v/total;
-      const a0 = acc * 2*Math.PI - Math.PI/2;
-      const a1 = (acc+frac) * 2*Math.PI - Math.PI/2;
-      acc += frac;
-      const x0 = cx + r*Math.cos(a0), y0 = cy + r*Math.sin(a0);
-      const x1 = cx + r*Math.cos(a1), y1 = cy + r*Math.sin(a1);
-      const xi0 = cx + ir*Math.cos(a0), yi0 = cy + ir*Math.sin(a0);
-      const xi1 = cx + ir*Math.cos(a1), yi1 = cy + ir*Math.sin(a1);
-      const large = (frac > 0.5) ? 1 : 0;
-      // Use a near-full path if a single segment is 100%
-      const isFull = frac >= 0.999;
-      let d;
-      if(isFull){
-        d = 'M '+(cx+r)+' '+cy+' A '+r+' '+r+' 0 1 1 '+(cx-r)+' '+cy+' A '+r+' '+r+' 0 1 1 '+(cx+r)+' '+cy+' Z M '+(cx+ir)+' '+cy+' A '+ir+' '+ir+' 0 1 0 '+(cx-ir)+' '+cy+' A '+ir+' '+ir+' 0 1 0 '+(cx+ir)+' '+cy+' Z';
-      } else {
-        d = 'M '+x0+' '+y0+' A '+r+' '+r+' 0 '+large+' 1 '+x1+' '+y1+' L '+xi1+' '+yi1+' A '+ir+' '+ir+' 0 '+large+' 0 '+xi0+' '+yi0+' Z';
-      }
-      const color = colors[i % colors.length];
-      svg += '<path d="'+d+'" fill="'+color+'" fill-rule="evenodd"><title>'+escapeHtml(s.name)+': '+fmtINR0(s.value||0)+' ('+(frac*100).toFixed(1)+'%)</title></path>';
-    });
-  }
-  svg += '</svg>';
-  const totalDisplay = (total>0)?fmtINR0(total):'&mdash;';
-  pieNode.innerHTML = svg + '<div class="rmp-center"><div class="rmp-c-lbl">Total</div><div class="rmp-c-val">'+totalDisplay+'</div></div>';
 
-  // Legend
+  // SVG canvas: wide rectangle so external labels fit on left/right.
+  // viewBox: 720 x 400. Donut centered at (360, 200), r=140, ir=92.
+  const W=720, H=400, cx=360, cy=200, r=140, ir=92;
+  // Label leader-line lengths
+  const leadOut = 22;     // distance from outer edge to elbow
+  const leadHoriz = 30;   // horizontal run after elbow
+
+  let svg = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Revenue breakdown pie">';
   if(total <= 0){
+    svg += '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="#ede5f3"/>';
+    svg += '<circle cx="'+cx+'" cy="'+cy+'" r="'+ir+'" fill="#fff"/>';
+    svg += '</svg>';
+    pieNode.innerHTML = svg + '<div class="rmp-center"><div class="rmp-c-lbl">Total</div><div class="rmp-c-val">&mdash;</div></div>';
     legendNode.innerHTML = '<div class="rml-empty">No revenue recorded for this period.</div>';
     return;
   }
+
+  // Compute segment paths first
+  let acc = 0;
+  const segMeta = [];
+  valid.forEach((s,i)=>{
+    if(s._v<=0) return;
+    const frac = s._v/total;
+    const a0 = acc*2*Math.PI - Math.PI/2;
+    const a1 = (acc+frac)*2*Math.PI - Math.PI/2;
+    const aMid = (a0+a1)/2;
+    acc += frac;
+    const x0 = cx + r*Math.cos(a0), y0 = cy + r*Math.sin(a0);
+    const x1 = cx + r*Math.cos(a1), y1 = cy + r*Math.sin(a1);
+    const xi0 = cx + ir*Math.cos(a0), yi0 = cy + ir*Math.sin(a0);
+    const xi1 = cx + ir*Math.cos(a1), yi1 = cy + ir*Math.sin(a1);
+    const large = (frac>0.5)?1:0;
+    const isFull = frac>=0.999;
+    let d;
+    if(isFull){
+      d = 'M '+(cx+r)+' '+cy+' A '+r+' '+r+' 0 1 1 '+(cx-r)+' '+cy+' A '+r+' '+r+' 0 1 1 '+(cx+r)+' '+cy+' Z M '+(cx+ir)+' '+cy+' A '+ir+' '+ir+' 0 1 0 '+(cx-ir)+' '+cy+' A '+ir+' '+ir+' 0 1 0 '+(cx+ir)+' '+cy+' Z';
+    } else {
+      d = 'M '+x0+' '+y0+' A '+r+' '+r+' 0 '+large+' 1 '+x1+' '+y1+' L '+xi1+' '+yi1+' A '+ir+' '+ir+' 0 '+large+' 0 '+xi0+' '+yi0+' Z';
+    }
+    segMeta.push({s, i, frac, aMid, d, color: colors[i%colors.length]});
+  });
+
+  // Render slices
+  segMeta.forEach(m=>{
+    svg += '<path d="'+m.d+'" fill="'+m.color+'" fill-rule="evenodd"><title>'+escapeHtml(m.s.name)+': '+fmtINR0(m.s.value||0)+' ('+(m.frac*100).toFixed(1)+'%)</title></path>';
+  });
+
+  // Render external labels with leader lines and anti-collision on the y axis.
+  // Skip slices that are too small (< 3%) to keep things clean — they still appear in legend.
+  const visibleLabels = segMeta.filter(m=>m.frac >= 0.03);
+  // Compute initial anchor points for each label
+  const labelInfos = visibleLabels.map(m=>{
+    const ax = cx + r*Math.cos(m.aMid);
+    const ay = cy + r*Math.sin(m.aMid);
+    const isRight = Math.cos(m.aMid) >= 0;
+    const elbowX = cx + (r+leadOut)*Math.cos(m.aMid);
+    const elbowY = cy + (r+leadOut)*Math.sin(m.aMid);
+    const textX = isRight ? (elbowX + leadHoriz) : (elbowX - leadHoriz);
+    let textY = elbowY;
+    return {m, ax, ay, isRight, elbowX, elbowY, textX, textY};
+  });
+  // Anti-collision: split into right/left, sort by Y, stack with min spacing.
+  const SPACING = 38;
+  const rightLabels = labelInfos.filter(L=>L.isRight).sort((a,b)=>a.textY-b.textY);
+  const leftLabels = labelInfos.filter(L=>!L.isRight).sort((a,b)=>a.textY-b.textY);
+  const fixStack = (arr)=>{
+    if(!arr.length) return;
+    // First pass: enforce min spacing top-down
+    for(let i=1;i<arr.length;i++){
+      if(arr[i].textY < arr[i-1].textY + SPACING){
+        arr[i].textY = arr[i-1].textY + SPACING;
+      }
+    }
+    // Clamp to viewbox
+    const TOP = 30, BOTTOM = H - 30;
+    if(arr[arr.length-1].textY > BOTTOM){
+      arr[arr.length-1].textY = BOTTOM;
+      for(let i=arr.length-2;i>=0;i--){
+        if(arr[i].textY > arr[i+1].textY - SPACING) arr[i].textY = arr[i+1].textY - SPACING;
+      }
+    }
+    if(arr[0].textY < TOP){
+      arr[0].textY = TOP;
+      for(let i=1;i<arr.length;i++){
+        if(arr[i].textY < arr[i-1].textY + SPACING) arr[i].textY = arr[i-1].textY + SPACING;
+      }
+    }
+  };
+  fixStack(rightLabels); fixStack(leftLabels);
+
+  // Render leader lines + text for each visible label
+  labelInfos.forEach(L=>{
+    const m = L.m;
+    const tx = L.textX;
+    const ty = L.textY;
+    // Leader: ax,ay -> elbowX,elbowY -> tx,ty (3-point polyline)
+    const polyPts = [
+      L.ax+','+L.ay,
+      L.elbowX+','+L.elbowY,
+      (tx + (L.isRight ? -6 : 6))+','+ty
+    ].join(' ');
+    svg += '<polyline class="rm-slice-leader" points="'+polyPts+'" stroke="'+m.color+'"/>';
+    // Dot at slice edge
+    svg += '<circle class="rm-slice-dot" cx="'+L.ax+'" cy="'+L.ay+'" fill="'+m.color+'"/>';
+    // Text block: name above value
+    const anchor = L.isRight ? 'start' : 'end';
+    const valStr = fmtINR0(m.s.value||0);
+    const pctStr = (m.frac*100).toFixed(1)+'%';
+    svg += '<g class="rm-slice-label" text-anchor="'+anchor+'">'
+      + '<text class="lbl-name" x="'+tx+'" y="'+(ty-6)+'">'+escapeHtml(m.s.name)+'</text>'
+      + '<text class="lbl-val"  x="'+tx+'" y="'+(ty+11)+'">'+valStr+' &middot; <tspan class="lbl-pct">'+pctStr+'</tspan></text>'
+      + '</g>';
+  });
+
+  svg += '</svg>';
+  const totalDisplay = fmtINR0(total);
+  pieNode.innerHTML = svg + '<div class="rmp-center"><div class="rmp-c-lbl">Total</div><div class="rmp-c-val">'+totalDisplay+'</div></div>';
+
+  // Extra-note legend (compact)
   legendNode.innerHTML = valid.map((s,i)=>{
     const pct = total>0 ? (s._v/total*100) : 0;
     const valStr = (s.value==null||isNaN(s.value))?'&mdash;':fmtINR0(s.value);
