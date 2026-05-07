@@ -121,6 +121,12 @@
   .rev-secondary .metric .lbl{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.72);text-transform:uppercase;letter-spacing:.08em}
   .rev-secondary .metric .val{font-size:14px;font-weight:800;color:#fff;line-height:1}
   .rev-secondary .metric + .metric{padding-left:14px;border-left:1px solid rgba(255,255,255,.28)}
+  /* 2x2 grid variant for Paid Media (Orders, AOV, ROAS, CAC) */
+  .rev-secondary.grid-2x2{display:grid;grid-template-columns:auto auto;gap:8px 26px;justify-content:center;align-items:start;flex-wrap:nowrap}
+  .rev-secondary.grid-2x2 .metric{display:flex;flex-direction:column;align-items:center;gap:1px}
+  .rev-secondary.grid-2x2 .metric + .metric{padding-left:0;border-left:none}
+  .rev-secondary.grid-2x2 .metric .lbl{font-size:9.5px;color:rgba(255,255,255,.74)}
+  .rev-secondary.grid-2x2 .metric .val{font-size:15px;font-weight:800}
   /* Big revenue amount */
   .funnel-step.revenue .fs-value{color:#fff;font-size:30px;font-weight:800;line-height:1.05;letter-spacing:-.01em;text-shadow:0 1px 2px rgba(0,0,0,.18);text-align:center;min-width:auto;padding:0;margin:2px 0 4px}
   /* Bolder click-to-drill-down at the BOTTOM */
@@ -975,8 +981,7 @@ function renderSummaryFunnelColumn(sd, pk){
     {id:"valid",   icon:F_ICONS.valid,    label:"Valid Leads", value:g("valid"),       prevName:"Leads", conv:g("l2v"), costLbl:"CPVL",  cost:g("cpvl"),    fmt:fmtInt},
     {id:"bt",      icon:F_ICONS.bt,       label:"Brief Taken", value:g("bt"),          prevName:"Valid", conv:g("v2b"), costLbl:"CPBT",  cost:g("cpbt"),    fmt:fmtInt},
     {id:"hv",      icon:F_ICONS.hv,       label:"Home Visits", value:g("hv"),          prevName:"Brief", conv:g("b2h"), costLbl:"CPHV",  cost:g("cphv"),    fmt:fmtInt},
-    {id:"orders",  icon:F_ICONS.orders,   label:"Orders",      value:g("perfOrders"),  prevName:"Visit", conv:null,     costLbl:"CAC",   cost:(sd.cacPerf?sd.cacPerf[pk]:null), fmt:fmtInt},
-    {id:"paidRev",    icon:F_ICONS.revenue, label:"Paid Media Revenue", value:g("perfRevenue"),  isRevenue:true, revKind:"paid",    cost:g("roas")},
+    {id:"paidRev",    icon:F_ICONS.revenue, label:"Paid Media Revenue", value:g("perfRevenue"),  isRevenue:true, revKind:"paid",    cost:g("roas"), orders:g("perfOrders"), aov:(sd.aovPerf?sd.aovPerf[pk]:null), cac:(sd.cacPerf?sd.cacPerf[pk]:null)},
     {id:"organicRev", icon:F_ICONS.revenue, label:"Organic Revenue",    value:g("otherRevenue"), isRevenue:true, revKind:"organic", orders:g("otherOrders")},
     {id:"totalRev",   icon:F_ICONS.revenue, label:"Total Revenue",      value:g("totalRevenue"), isRevenue:true, revKind:"total",   orders:g("totalOrders"), aov:(sd.aovTotal?sd.aovTotal[pk]:null), cac:(sd.cacTotal?sd.cacTotal[pk]:null)}
   ];
@@ -998,22 +1003,8 @@ function renderSummaryFunnelColumn(sd, pk){
         h += '<div class="funnel-connector"></div>';
       }
     }
-    // Direct-to-order conversion block + connector right BEFORE the first revenue card
+    // Just open the rev-stack right BEFORE the first revenue card (conv-block now lives at the bottom)
     if(s.isRevenue && (i===0 || !steps[i-1].isRevenue)){
-      h += '<div class="funnel-connector"></div>';
-      const fmtPair = v=>{
-        if(v==null||isNaN(v)) return '<span class="none">&mdash;</span>';
-        const drop=100-v;
-        return '<span class="pass">'+v.toFixed(2)+'% pass</span><span class="drop">'+drop.toFixed(2)+'% drop</span>';
-      };
-      h += '<div class="conv-block">'
-        +'<div class="cb-title">Direct-to-order conversion</div>'
-        +'<div class="cb-grid">'
-        +'<div class="cb-col"><div class="lbl">Lead &rarr; Order %</div><div class="vals">'+fmtPair(lead2order)+'</div></div>'
-        +'<div class="cb-col"><div class="lbl">Valid Lead &rarr; Order %</div><div class="vals">'+fmtPair(valid2order)+'</div></div>'
-        +'<div class="cb-col"><div class="lbl">Home Visits &rarr; Order %</div><div class="vals">'+fmtPair(visit2order)+'</div></div>'
-        +'</div>'
-        +'</div>';
       h += '<div class="funnel-connector"></div>';
       h += '<div class="rev-stack">';
     }
@@ -1028,7 +1019,15 @@ function renderSummaryFunnelColumn(sd, pk){
       if(s.revKind==='paid'){
         extraCls = ' revenue clickable';
         const roasFmt = (s.cost==null||isNaN(s.cost))?'&mdash;':Number(s.cost).toFixed(2)+'x';
-        secondary = '<div class="rev-secondary"><span class="metric"><span class="lbl">ROAS</span> <span class="val">'+roasFmt+'</span></span></div>';
+        const ord = (s.orders==null||isNaN(s.orders))?'&mdash;':fmtInt(s.orders);
+        const aov = (s.aov==null||isNaN(s.aov))?'&mdash;':fmtINR0(s.aov);
+        const cac = (s.cac==null||isNaN(s.cac))?'&mdash;':fmtINR0(s.cac);
+        secondary = '<div class="rev-secondary grid-2x2">'
+          +'<span class="metric"><span class="lbl">Orders</span><span class="val">'+ord+'</span></span>'
+          +'<span class="metric"><span class="lbl">AOV</span><span class="val">'+aov+'</span></span>'
+          +'<span class="metric"><span class="lbl">ROAS</span><span class="val">'+roasFmt+'</span></span>'
+          +'<span class="metric"><span class="lbl">CAC</span><span class="val">'+cac+'</span></span>'
+          +'</div>';
       } else if(s.revKind==='organic'){
         extraCls = ' revenue organic-rev clickable';
         const ord = (s.orders==null||isNaN(s.orders))?'&mdash;':fmtInt(s.orders);
@@ -1072,9 +1071,24 @@ function renderSummaryFunnelColumn(sd, pk){
         + metaHtml
         + '</div>';
     }
-    // Close the rev-stack wrapper after the LAST revenue card
+    // Close the rev-stack wrapper after the LAST revenue card,
+    // then drop the Direct-to-order conversion block underneath everything.
     if(s.isRevenue && (i===steps.length-1 || !steps[i+1].isRevenue)){
       h += '</div>';
+      const fmtPair = v=>{
+        if(v==null||isNaN(v)) return '<span class="none">&mdash;</span>';
+        const drop=100-v;
+        return '<span class="pass">'+v.toFixed(2)+'% pass</span><span class="drop">'+drop.toFixed(2)+'% drop</span>';
+      };
+      h += '<div class="funnel-connector"></div>';
+      h += '<div class="conv-block">'
+        +'<div class="cb-title">Direct-to-order conversion</div>'
+        +'<div class="cb-grid">'
+        +'<div class="cb-col"><div class="lbl">Lead &rarr; Order %</div><div class="vals">'+fmtPair(lead2order)+'</div></div>'
+        +'<div class="cb-col"><div class="lbl">Valid Lead &rarr; Order %</div><div class="vals">'+fmtPair(valid2order)+'</div></div>'
+        +'<div class="cb-col"><div class="lbl">Home Visits &rarr; Order %</div><div class="vals">'+fmtPair(visit2order)+'</div></div>'
+        +'</div>'
+        +'</div>';
     }
   });
   return h;
