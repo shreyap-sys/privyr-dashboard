@@ -184,6 +184,62 @@
   .legend .sw.sage{background:var(--sage)}
   .legend .sw.rose{background:var(--rose)}
   .legend .sw.amber{background:#c69b4a}
+
+  /* === Summary Funnel === */
+  .summary-head{padding:14px 0 10px}
+  .summary-head .sh-title{font-size:18px;font-weight:800;color:#3a2552;letter-spacing:-.01em}
+  .summary-head .sh-sub{font-size:13px;color:#5a4670;margin-top:2px}
+  .summary-head .sh-sub strong{color:#6f2da8}
+  /* Spend card looks like a funnel-step but in a different accent */
+  .funnel-step.spend{background:linear-gradient(135deg,#f6efff 0%,#ede2f7 100%);border:1px solid #d9c4ee;color:#3a2552}
+  .funnel-step.spend .fs-label{color:#5a4670}
+  .funnel-step.spend .fs-value{color:#3a2552}
+  .funnel-step.revenue.clickable{cursor:pointer;transition:transform 140ms ease,box-shadow 140ms ease}
+  .funnel-step.revenue.clickable:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(111,45,168,.42),inset 0 1px 0 rgba(255,255,255,.32)}
+  .funnel-step.revenue.clickable::after,.funnel-step.revenue.clickable::before{pointer-events:none}
+  .funnel-step.revenue .rm-hint{position:relative;z-index:1;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;opacity:.85;margin-top:4px;display:inline-flex;align-items:center;gap:4px}
+  .funnel-step.revenue .rm-hint svg{width:11px;height:11px}
+
+  /* === Revenue Modal === */
+  .rev-modal{position:fixed;inset:0;display:none;z-index:9999;align-items:center;justify-content:center}
+  .rev-modal.open{display:flex}
+  .rm-backdrop{position:absolute;inset:0;background:rgba(34,18,52,.55);backdrop-filter:blur(4px)}
+  .rm-card{position:relative;width:min(960px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;background:#fff;border-radius:16px;box-shadow:0 28px 60px rgba(34,18,52,.35);padding:22px 24px}
+  .rm-close{position:absolute;top:10px;right:14px;background:transparent;border:none;font-size:26px;color:#5a4670;cursor:pointer;line-height:1;padding:4px 8px;border-radius:6px}
+  .rm-close:hover{background:#f3eaff;color:#3a2552}
+  .rm-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid #ede5f3;padding-bottom:12px;margin-bottom:14px}
+  .rm-title{font-size:18px;font-weight:800;color:#3a2552;letter-spacing:-.01em}
+  .rm-period-tabs{display:inline-flex;background:#f6efff;border:1px solid #e3d3f3;border-radius:10px;padding:3px}
+  .rm-pt-btn{border:none;background:transparent;color:#5a4670;font-weight:700;font-size:12px;padding:6px 12px;border-radius:7px;cursor:pointer;font-family:inherit;letter-spacing:.01em}
+  .rm-pt-btn.active{background:#6f2da8;color:#fff;box-shadow:0 2px 6px rgba(111,45,168,.35)}
+  .rm-source-tabs{display:flex;gap:4px;border-bottom:1px solid #ede5f3;margin-bottom:14px}
+  .rm-st-btn{border:none;background:transparent;color:#5a4670;font-weight:700;font-size:13px;padding:9px 16px;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .rm-st-btn:hover:not(.active){color:#6f2da8}
+  .rm-st-btn.active{color:#6f2da8;border-bottom-color:#6f2da8}
+  .rm-pane{display:none}
+  .rm-pane.active{display:block}
+  .rm-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px}
+  .rm-metric{background:#fafaff;border:1px solid #ede5f3;border-radius:10px;padding:10px 12px}
+  .rm-metric .rmm-lbl{font-size:11px;font-weight:700;color:#7a6892;text-transform:uppercase;letter-spacing:.04em}
+  .rm-metric .rmm-val{font-size:18px;font-weight:800;color:#3a2552;margin-top:3px}
+  .rm-metric .rmm-val.muted{color:#a99cba}
+  .rm-chart-wrap{background:#faf7fd;border:1px solid #ede5f3;border-radius:12px;padding:14px 16px}
+  .rm-chart-title{font-size:13px;font-weight:700;color:#3a2552;margin-bottom:10px}
+  .rm-chart-title span{color:#6f2da8}
+  .rm-chart-row{display:grid;grid-template-columns:200px 1fr;gap:18px;align-items:center}
+  @media (max-width:560px){.rm-chart-row{grid-template-columns:1fr;justify-items:center}}
+  .rm-pie{position:relative;width:200px;height:200px}
+  .rm-pie svg{width:100%;height:100%}
+  .rm-pie .rmp-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .rm-pie .rmp-c-lbl{font-size:10px;font-weight:700;color:#7a6892;text-transform:uppercase;letter-spacing:.05em}
+  .rm-pie .rmp-c-val{font-size:18px;font-weight:800;color:#3a2552;margin-top:2px}
+  .rm-legend{display:flex;flex-direction:column;gap:7px}
+  .rm-legend .rml-row{display:grid;grid-template-columns:14px 1fr auto auto;gap:10px;align-items:center;font-size:13px}
+  .rm-legend .rml-sw{width:14px;height:14px;border-radius:4px}
+  .rm-legend .rml-name{color:#3a2552;font-weight:600}
+  .rm-legend .rml-val{color:#5a4670;font-weight:700;text-align:right}
+  .rm-legend .rml-pct{color:#6f2da8;font-weight:800;text-align:right;min-width:46px}
+  .rm-legend .rml-empty{color:#a99cba;font-style:italic;font-size:12px;padding:6px 0}
 </style>
 </head>
 <body>
@@ -205,10 +261,12 @@
   </div>
 
   <div id="top-summary" class="top-content" role="tabpanel">
-    <div class="placeholder-card">
-      <div class="pc-title">Summary view</div>
-      <div class="pc-sub">A high-level cross-platform summary will live here — combining Privyr and Website performance into a single executive snapshot. Coming next.</div>
-      <div class="pc-pill">Coming soon</div>
+    <div class="summary-head">
+      <div class="sh-title">Cross-Channel Performance Funnel</div>
+      <div class="sh-sub">Pulls from <strong>Summary Dashboard</strong> tab. Click the Revenue card to drill into Paid Media &amp; Organic revenue.</div>
+    </div>
+    <div id="summary-funnel">
+      <div class="funnel-empty">Loading summary funnel&hellip;</div>
     </div>
   </div>
 
@@ -417,6 +475,47 @@
     </div>
   </div>
 
+
+<div id="rev-modal" class="rev-modal" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="rm-backdrop" data-rm-close="1"></div>
+  <div class="rm-card" role="document">
+    <button class="rm-close" data-rm-close="1" aria-label="Close">&times;</button>
+    <div class="rm-head">
+      <div class="rm-title">Revenue Breakdown</div>
+      <div class="rm-period-tabs" role="tablist" aria-label="Period">
+        <button class="rm-pt-btn active" data-period="lifetime" role="tab" aria-selected="true">Lifetime</button>
+        <button class="rm-pt-btn" data-period="l30" role="tab" aria-selected="false">Last 30 days</button>
+        <button class="rm-pt-btn" data-period="l7" role="tab" aria-selected="false">Last 7 days</button>
+      </div>
+    </div>
+    <div class="rm-body">
+      <div class="rm-source-tabs" role="tablist" aria-label="Source">
+        <button class="rm-st-btn active" data-source="paid" role="tab" aria-selected="true">Paid Media</button>
+        <button class="rm-st-btn" data-source="organic" role="tab" aria-selected="false">Organic</button>
+      </div>
+      <div class="rm-pane active" data-pane="paid">
+        <div class="rm-metrics" id="rm-paid-metrics"></div>
+        <div class="rm-chart-wrap">
+          <div class="rm-chart-title">Revenue split &mdash; <span id="rm-paid-period-lbl">Lifetime</span></div>
+          <div class="rm-chart-row">
+            <div id="rm-paid-pie" class="rm-pie"></div>
+            <div id="rm-paid-legend" class="rm-legend"></div>
+          </div>
+        </div>
+      </div>
+      <div class="rm-pane" data-pane="organic">
+        <div class="rm-metrics" id="rm-organic-metrics"></div>
+        <div class="rm-chart-wrap">
+          <div class="rm-chart-title">Revenue split &mdash; <span id="rm-organic-period-lbl">Lifetime</span></div>
+          <div class="rm-chart-row">
+            <div id="rm-organic-pie" class="rm-pie"></div>
+            <div id="rm-organic-legend" class="rm-legend"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 <script>
 (()=>{"use strict";
@@ -428,6 +527,7 @@ const PUBHTML_URL=PUB_BASE+"html";
 const SHEET_GID="825204121"; // Creative Effectiveness_Privyr
 const AGR_GID="497381798"; // Ad Generated Revenue
 const PAE_GID="1240428045"; // Platform Ad Efficiency_Mktg
+const SUMMARY_GID="1164859268"; // Summary Dashboard
 const CSV_URL=PUB_BASE+"?output=csv&gid="+SHEET_GID;
 const AGR_TAB_NAME="Ad Generated Revenue";
 const PAE_TAB_NAME="Platform Ad Efficiency_Mktg";
@@ -564,7 +664,441 @@ function parsePAEFromNL(content){
   return buildPAEResult(map);
 }
 
-const state={rows:[],totals:{orders:null,revenue:null,rowCount:0},pae:null,filter:localStorage.getItem(STORAGE_KEY+":filter")||"all",sort:JSON.parse(localStorage.getItem(STORAGE_KEY+":sort")||'{"key":"cpl","dir":"asc"}')};
+// === Summary Dashboard: parsers + renderers + modal ===
+
+const SUMMARY_KEY_DEFS = [
+  ["spend","total spend"],
+  ["leads","total leads"],
+  ["cpl","cpl"],
+  ["valid","valid lead"],
+  ["cpvl","cpvl"],
+  ["l2v","all lead"],
+  ["bt","brief taken (\\#)","brief taken"],
+  ["cpbt","cpbt"],
+  ["v2b","valid lead → brief","valid lead -> brief"],
+  ["hv","home visits"],
+  ["cphv","cphv"],
+  ["b2h","brief taken → home","brief taken -> home"],
+  ["perfOrders","perf mktg total orders"],
+  ["perfRevenue","perf mktg total revenue"],
+  ["v2o","valid lead → order","valid lead -> order"],
+  ["cpa","cpa"],
+  ["roas","roas"],
+  ["privyrOrders","privyr closed orders"],
+  ["privyrRevenue","privyr revenue"],
+  ["websiteOrders","website closed orders"],
+  ["websiteRevenue","website revenue"],
+  ["dtOrders","doubletick closed orders"],
+  ["dtRevenue","doubletick revenue"],
+  ["otherOrders","other sources closed orders"],
+  ["otherRevenue","other sources revenue"],
+  ["fdOrders","first degree orders"],
+  ["fdRevenue","first degree revenue"],
+  ["desOrders","designer orders"],
+  ["desRevenue","designer revenue"],
+  ["sgaOrders","society group activation orders"],
+  ["sgaRevenue","society group activation revenue"],
+  ["ssaOrders","society standee activation orders"],
+  ["ssaRevenue","society standee activation revenue"],
+  ["womOrders","word of mouth orders"],
+  ["womRevenue","word of mouth revenue"],
+  ["smdmOrders","social media dm orders"],
+  ["smdmRevenue","social media dm revenue"],
+  ["totalOrders","total orders"],
+  ["totalRevenue","total revenue"]
+];
+
+function summaryNorm(s){return String(s||"").replace(/\\\_/g,"_").replace(/\s+/g," ").trim().toLowerCase();}
+
+function buildSummaryFromRows(items){
+  // items: array of {source, metric, life, l30, l7} in the order they appeared.
+  const findFirst = (...prefixes)=>{
+    for(const p of prefixes){
+      const pp = p.toLowerCase();
+      for(const it of items){
+        if(it.metric.toLowerCase().startsWith(pp)) return {lifetime:it.life,l30:it.l30,l7:it.l7};
+      }
+    }
+    return {lifetime:null,l30:null,l7:null};
+  };
+  const collectAll = (prefix)=>{
+    const pp = prefix.toLowerCase();
+    return items.filter(it=>it.metric.toLowerCase().startsWith(pp));
+  };
+  const out = {};
+  for(const def of SUMMARY_KEY_DEFS){
+    const key = def[0];
+    const aliases = def.slice(1);
+    out[key] = findFirst.apply(null, aliases);
+  }
+  // AOV / CAC: appear twice (Perf, then Total). Disambiguate by source column.
+  // Filter out the "- 30 days spends" variant which is a separate metric.
+  const aovList = collectAll("aov").filter(it=>!/30 days spends/i.test(it.metric));
+  const cacList = collectAll("cac").filter(it=>!/30 days spends/i.test(it.metric));
+  const aovPerf = aovList.find(it=>/perf marketing/i.test(it.source)) || aovList[0] || null;
+  const aovTotal = aovList.find(it=>/total/i.test(it.source) && /perf mktg \+ other/i.test(it.source)) || aovList.find(it=>/total/i.test(it.source)) || aovList[aovList.length-1] || null;
+  const cacPerf = cacList.find(it=>/perf marketing/i.test(it.source)) || cacList[0] || null;
+  const cacTotal = cacList.find(it=>/total/i.test(it.source) && /perf mktg \+ other/i.test(it.source)) || cacList.find(it=>/total/i.test(it.source)) || cacList[cacList.length-1] || null;
+  const pickPeriods = (it)=>it?{lifetime:it.life,l30:it.l30,l7:it.l7}:{lifetime:null,l30:null,l7:null};
+  out.aovPerf = pickPeriods(aovPerf);
+  out.aovTotal = pickPeriods(aovTotal);
+  out.cacPerf = pickPeriods(cacPerf);
+  out.cacTotal = pickPeriods(cacTotal);
+  return out;
+}
+
+function parseSummaryFromCSV(csvText){
+  const all = parseCSV(csvText);
+  let hdr = -1;
+  for(let i=0;i<all.length;i++){
+    const r = all[i]; if(!r||r.length<5) continue;
+    const a = (r[0]||"").trim().toLowerCase();
+    const b = (r[1]||"").trim().toLowerCase();
+    if(a==="source" && b.indexOf("metric")===0){ hdr = i; break; }
+  }
+  if(hdr<0) throw new Error("Summary Dashboard header (Source,Metric,…) not found.");
+  const items = [];
+  let curSource = "";
+  const _isLabel = s => s && isNaN(parseFloat(String(s).replace(/[₹\s,%]/g,"")));
+  for(let i=hdr+1;i<all.length;i++){
+    let r = all[i]; if(!r) continue;
+    // Left-shift extra empty leading cols so the metric lands at index 1
+    while(r.length>=4 && !((r[0]||"").trim()) && !((r[1]||"").trim()) && _isLabel((r[2]||"").trim())){
+      r = r.slice(1);
+    }
+    const a = (r[0]||"").trim();
+    const m = (r[1]||"").trim();
+    if(a) curSource = a;
+    if(!m) continue;
+    items.push({source:curSource, metric:m, life:num(r[2]), l30:num(r[3]), l7:num(r[4])});
+  }
+  return buildSummaryFromRows(items);
+}
+
+function parseSummaryFromNL(content){
+  // Find the second occurrence of "Source,Metric,Lifetime (To Date)"
+  // (the first is in some tabs we don't care about; the SD header sits inside the
+  // "Summary Dashboard" section.)
+  const all = [];
+  let from = 0;
+  while(true){
+    const idx = content.indexOf("Source,Metric,Lifetime (To Date)", from);
+    if(idx<0) break;
+    all.push(idx);
+    from = idx + 20;
+  }
+  if(!all.length) return null;
+  // The Summary Dashboard header is the one preceded by "Summary Dashboard" within ~150 chars.
+  let pickIdx = all[0];
+  for(const i of all){
+    const back = content.slice(Math.max(0,i-200), i);
+    if(/Summary Dashboard/.test(back) && !/Monthwise Summary Dashboard/.test(back)){
+      pickIdx = i; break;
+    }
+  }
+  // Body extends until next tab marker.
+  const stops = [
+    content.indexOf("Monthwise Summary Dashboard", pickIdx+50),
+    content.indexOf("Lead Performance ", pickIdx+50),
+    content.indexOf("Conversion Outcomes ", pickIdx+50),
+    content.indexOf("Insights & Actions", pickIdx+50)
+  ].filter(x=>x>0);
+  const endIdx = stops.length?Math.min.apply(null,stops):pickIdx+8000;
+  // Skip past the header line itself: header ends with ",Daily " right before the first data row.
+  // The data rows in this tab start with "Perf Marketing (Blended)" which means the body starts
+  // right before "Perf Marketing (Blended)". Find that anchor.
+  let bodyStart = pickIdx + "Source,Metric,Lifetime (To Date),Last 30 Days,Last 7 Days,,Daily".length;
+  // Walk forward to land just before the first data row. Skip whitespace.
+  while(bodyStart < endIdx && /\s/.test(content[bodyStart])) bodyStart++;
+  const body = content.slice(bodyStart, endIdx);
+  // Quote-aware row splitter: walks through the body, skipping any whitespace that
+  // sits inside double-quoted values. A row boundary is a run of whitespace OUTSIDE
+  // a quote where the next char is either a capital letter (new source row) or a
+  // comma (continuation row), AND the current accumulator already has ≥2 commas
+  // (i.e. looks like a complete row).
+  const parts = (function(b){
+    const rows=[]; let cur=""; let inQ=false; let i=0;
+    while(i<b.length){
+      const c=b[i];
+      if(c==='"'){ inQ=!inQ; cur+=c; i++; continue; }
+      if(!inQ && /\s/.test(c)){
+        let j=i; while(j<b.length && /\s/.test(b[j]) && b[j]!=='"') j++;
+        const next=b[j];
+        const commaCount=(cur.match(/,/g)||[]).length;
+        if(next && /[A-Z",]/.test(next) && commaCount>=2){
+          rows.push(cur); cur=""; i=j; continue;
+        } else {
+          cur += " "; i=j; continue;
+        }
+      }
+      cur+=c; i++;
+    }
+    if(cur.length) rows.push(cur);
+    return rows;
+  })(body);
+  const items = [];
+  let curSource = "";
+  const _isLabel2 = s => s && isNaN(parseFloat(String(s).replace(/[₹\s,%]/g,"")));
+  for(let i=0;i<parts.length;i++){
+    let cols = parseCsvRow(parts[i].trim());
+    if(cols.length<5) continue;
+    while(cols.length>=4 && !((cols[0]||"").trim()) && !((cols[1]||"").trim()) && _isLabel2((cols[2]||"").trim())){
+      cols = cols.slice(1);
+    }
+    const a = (cols[0]||"").trim();
+    const m = (cols[1]||"").trim();
+    if(/^source$/i.test(a) && /^metric$/i.test(m)) continue; // skip header
+    if(a) curSource = a;
+    if(!m) continue;
+    items.push({source:curSource, metric:m, life:num(cols[2]), l30:num(cols[3]), l7:num(cols[4])});
+  }
+  if(!items.length) return null;
+  return buildSummaryFromRows(items);
+}
+
+// === Summary Funnel renderer ===
+function renderSummaryFunnel(){
+  const sd = state.summary || null;
+  const node = el('summary-funnel');
+  if(!node) return;
+  if(!sd){ node.innerHTML = '<div class="funnel-empty">Summary Dashboard data not available.</div>'; return; }
+  const periods = [{key:"lifetime",label:"Lifetime"},{key:"l30",label:"Last 30 days"},{key:"l7",label:"Last 7 days"}];
+  let html = '<div class="funnels-row">';
+  for(const p of periods){
+    html += '<div class="funnel-column">';
+    html += '<div class="fc-title">'+p.label+'</div>';
+    html += renderSummaryFunnelColumn(sd, p.key);
+    html += '</div>';
+  }
+  html += '</div>';
+  node.innerHTML = html;
+  // Wire up Revenue badge clicks
+  node.querySelectorAll('.funnel-step.revenue.clickable').forEach(box=>{
+    box.addEventListener('click',()=>{
+      const period = box.dataset.period || 'lifetime';
+      openRevenueModal(period);
+    });
+  });
+}
+
+function renderSummaryFunnelColumn(sd, pk){
+  const g = k => (sd[k] && typeof sd[k][pk]==="number") ? sd[k][pk] : null;
+  const leadsV = g("leads"), validV = g("valid"), hvV = g("hv"), ordersV = g("perfOrders");
+  const lead2order  = (leadsV  && leadsV>0  && ordersV!=null) ? (ordersV/leadsV)*100  : null;
+  const valid2order = (validV  && validV>0  && ordersV!=null) ? (ordersV/validV)*100  : null;
+  const visit2order = (hvV     && hvV>0     && ordersV!=null) ? (ordersV/hvV)*100     : null;
+
+  const SPEND_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
+
+  const steps = [
+    {id:"spend",   icon:SPEND_ICON,       label:"Spend",       value:g("spend"),       prevName:null,    conv:null,     costLbl:null,    cost:null,         fmt:fmtINR0, isSpend:true},
+    {id:"leads",   icon:F_ICONS.leads,    label:"Leads",       value:g("leads"),       prevName:null,    conv:null,     costLbl:"CPL",   cost:g("cpl"),     fmt:fmtInt},
+    {id:"valid",   icon:F_ICONS.valid,    label:"Valid Leads", value:g("valid"),       prevName:"Leads", conv:g("l2v"), costLbl:"CPVL",  cost:g("cpvl"),    fmt:fmtInt},
+    {id:"bt",      icon:F_ICONS.bt,       label:"Brief Taken", value:g("bt"),          prevName:"Valid", conv:g("v2b"), costLbl:"CPBT",  cost:g("cpbt"),    fmt:fmtInt},
+    {id:"hv",      icon:F_ICONS.hv,       label:"Home Visits", value:g("hv"),          prevName:"Brief", conv:g("b2h"), costLbl:"CPHV",  cost:g("cphv"),    fmt:fmtInt},
+    {id:"orders",  icon:F_ICONS.orders,   label:"Orders",      value:g("perfOrders"),  prevName:"Visit", conv:null,     costLbl:"CAC",   cost:(sd.cacPerf?sd.cacPerf[pk]:null), fmt:fmtInt},
+    {id:"revenue", icon:F_ICONS.revenue,  label:"Revenue",     value:g("perfRevenue"), prevName:null,    conv:null,     costLbl:"ROAS",  cost:g("roas"),    fmt:fmtINR0, isRevenue:true}
+  ];
+
+  // Biggest drop calc among non-spend steps
+  let biggest=-1, biggestDrop=-1;
+  for(let i=0;i<steps.length;i++){ if(steps[i].conv!=null){const d=100-steps[i].conv; if(d>biggestDrop){biggestDrop=d;biggest=i;}} }
+
+  let h = '';
+  steps.forEach((s,i)=>{
+    // Connector before each step EXCEPT the first (Spend) and skip for Revenue (we add a custom block below)
+    if(i>0 && s.id!=="revenue"){
+      const isBig = (i===biggest);
+      const conv = s.conv;
+      if(conv!=null){
+        const drop = 100-conv;
+        h += '<div class="funnel-connector'+(isBig?' biggest':'')+'"><div class="pill-info">'+(isBig?F_ARROW_DOWN:F_ARROW_UP)+'<span>'+s.prevName+' &rarr; '+s.label.split(' ')[0]+': <span class="pass">'+conv.toFixed(1)+'%</span> pass &middot; <span class="drop">'+drop.toFixed(1)+'% drop</span>'+(isBig?' &middot; biggest drop':'')+'</span></div></div>';
+      } else {
+        h += '<div class="funnel-connector"></div>';
+      }
+    }
+    if(s.id==="revenue"){
+      h += '<div class="funnel-connector"></div>';
+      const fmtPair = v=>{
+        if(v==null||isNaN(v)) return '<span class="none">&mdash;</span>';
+        const drop=100-v;
+        return '<span class="pass">'+v.toFixed(2)+'% pass</span><span class="drop">'+drop.toFixed(2)+'% drop</span>';
+      };
+      h += '<div class="conv-block">'
+        +'<div class="cb-title">Direct-to-order conversion</div>'
+        +'<div class="cb-grid">'
+        +'<div class="cb-col"><div class="lbl">Lead &rarr; Order %</div><div class="vals">'+fmtPair(lead2order)+'</div></div>'
+        +'<div class="cb-col"><div class="lbl">Valid Lead &rarr; Order %</div><div class="vals">'+fmtPair(valid2order)+'</div></div>'
+        +'<div class="cb-col"><div class="lbl">Home Visits &rarr; Order %</div><div class="vals">'+fmtPair(visit2order)+'</div></div>'
+        +'</div>'
+        +'</div>';
+      h += '<div class="funnel-connector"></div>';
+    }
+    const wcls = 's'+Math.min(i+1,5);
+    const valFmt = (s.value==null)?'&mdash;':s.fmt(s.value);
+    let metaHtml = '';
+    if(s.isRevenue){
+      const roasFmt = (s.cost==null||isNaN(s.cost))?'&mdash;':Number(s.cost).toFixed(2)+'x';
+      metaHtml = '<div class="revenue-roas"><div class="rr-lbl">ROAS</div><div class="rr-val">'+roasFmt+'</div></div>'
+        + '<div class="rm-hint">click to drill down &rarr;</div>';
+    } else if(s.isSpend){
+      metaHtml = '<div class="fs-meta"><span>Total spend (paid media)</span></div>';
+    } else {
+      const convLine = (s.conv==null)?('<span>'+(i===0||i===1?'Top of funnel':'')+'</span>'):('<span class="conv">'+s.conv.toFixed(1)+'%</span> from '+s.prevName);
+      const costLine = (s.cost==null)?'':('<span class="cost">'+s.costLbl+' '+(s.id==='orders'?fmtINR0(s.cost):fmtINR0(s.cost))+'</span>');
+      metaHtml = '<div class="fs-meta">'+convLine+costLine+'</div>';
+    }
+    const extraCls = s.isSpend?' spend':(s.isRevenue?' revenue clickable':'');
+    const dataAttr = s.isRevenue?(' data-period="'+pk+'" role="button" tabindex="0" aria-label="Open revenue breakdown"'):'';
+    h += '<div class="funnel-step '+wcls+extraCls+'"'+dataAttr+'>'
+      + '<div class="fs-icon">'+s.icon+'</div>'
+      + '<div class="fs-label">'+s.label+'</div>'
+      + '<div class="fs-value">'+valFmt+'</div>'
+      + metaHtml
+      + '</div>';
+  });
+  return h;
+}
+
+// === Revenue Modal ===
+const PAID_COLORS = ["#6f2da8","#a259d4","#d6a8f0"];
+const ORGANIC_COLORS = ["#6f2da8","#a259d4","#d6a8f0","#3a8db8","#16a34a","#dc8a16"];
+
+const PERIOD_LABELS = {lifetime:"Lifetime", l30:"Last 30 days", l7:"Last 7 days"};
+
+const _modalState = {period:"lifetime", source:"paid"};
+
+function openRevenueModal(period){
+  _modalState.period = period || "lifetime";
+  _modalState.source = "paid";
+  const m = el('rev-modal'); if(!m) return;
+  // Set period button active
+  m.querySelectorAll('.rm-pt-btn').forEach(b=>{
+    const on = b.dataset.period === _modalState.period;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on?'true':'false');
+  });
+  m.querySelectorAll('.rm-st-btn').forEach(b=>{
+    const on = b.dataset.source === _modalState.source;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on?'true':'false');
+  });
+  m.querySelectorAll('.rm-pane').forEach(p=>{
+    p.classList.toggle('active', p.dataset.pane === _modalState.source);
+  });
+  renderRevenueModal();
+  m.classList.add('open');
+  m.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeRevenueModal(){
+  const m = el('rev-modal'); if(!m) return;
+  m.classList.remove('open');
+  m.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+}
+
+function renderRevenueModal(){
+  const sd = state.summary || {};
+  const pk = _modalState.period;
+  const pLbl = PERIOD_LABELS[pk] || "Lifetime";
+  const get = (k)=>(sd[k] && typeof sd[k][pk]==="number") ? sd[k][pk] : null;
+
+  // Paid Media metrics (header)
+  const paidMetrics = [
+    {lbl:"Perf Mktg Total Orders", val:get("perfOrders"), fmt:fmtInt},
+    {lbl:"Perf Mktg Total Revenue", val:get("perfRevenue"), fmt:fmtINR0},
+    {lbl:"ROAS", val:get("roas"), fmt:fmtMult},
+    {lbl:"AOV", val:get("aovPerf"), fmt:fmtINR0},
+    {lbl:"CAC", val:get("cacPerf"), fmt:fmtINR0}
+  ];
+  el('rm-paid-metrics').innerHTML = paidMetrics.map(m=>'<div class="rm-metric"><div class="rmm-lbl">'+m.lbl+'</div><div class="rmm-val'+(m.val==null||isNaN(m.val)?' muted':'')+'">'+(m.val==null||isNaN(m.val)?'&mdash;':m.fmt(m.val))+'</div></div>').join('');
+
+  // Paid Media pie segments
+  const paidSegs = [
+    {name:"Privyr",     orders:get("privyrOrders"),   value:get("privyrRevenue")},
+    {name:"Website",    orders:get("websiteOrders"),  value:get("websiteRevenue")},
+    {name:"DoubleTick", orders:get("dtOrders"),       value:get("dtRevenue")}
+  ];
+  el('rm-paid-period-lbl').textContent = pLbl;
+  drawPie(el('rm-paid-pie'), el('rm-paid-legend'), paidSegs, PAID_COLORS, get("perfRevenue"));
+
+  // Organic metrics
+  const organicMetrics = [
+    {lbl:"Other Sources Orders", val:get("otherOrders"), fmt:fmtInt},
+    {lbl:"Other Sources Revenue", val:get("otherRevenue"), fmt:fmtINR0},
+    {lbl:"AOV (Total)", val:get("aovTotal"), fmt:fmtINR0},
+    {lbl:"CAC (Total)", val:get("cacTotal"), fmt:fmtINR0}
+  ];
+  el('rm-organic-metrics').innerHTML = organicMetrics.map(m=>'<div class="rm-metric"><div class="rmm-lbl">'+m.lbl+'</div><div class="rmm-val'+(m.val==null||isNaN(m.val)?' muted':'')+'">'+(m.val==null||isNaN(m.val)?'&mdash;':m.fmt(m.val))+'</div></div>').join('');
+
+  const organicSegs = [
+    {name:"First Degree",       orders:get("fdOrders"),   value:get("fdRevenue")},
+    {name:"Designer",           orders:get("desOrders"),  value:get("desRevenue")},
+    {name:"Society Group Act.", orders:get("sgaOrders"),  value:get("sgaRevenue")},
+    {name:"Society Standee",    orders:get("ssaOrders"),  value:get("ssaRevenue")},
+    {name:"Word of Mouth",      orders:get("womOrders"),  value:get("womRevenue")},
+    {name:"Social Media DM",    orders:get("smdmOrders"), value:get("smdmRevenue")}
+  ];
+  el('rm-organic-period-lbl').textContent = pLbl;
+  drawPie(el('rm-organic-pie'), el('rm-organic-legend'), organicSegs, ORGANIC_COLORS, get("otherRevenue"));
+}
+
+function drawPie(pieNode, legendNode, segments, colors, totalOverride){
+  if(!pieNode||!legendNode) return;
+  // Filter zero/null segments for the visual but show all in legend (with 0)
+  const valid = segments.map(s=>({...s, _v: (s.value==null||isNaN(s.value)||s.value<=0)?0:s.value}));
+  const total = (totalOverride!=null && !isNaN(totalOverride) && totalOverride>0) ? totalOverride : valid.reduce((a,b)=>a+b._v,0);
+  // Build SVG donut
+  const cx=100, cy=100, r=80, ir=52;
+  let svg = '<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Revenue breakdown pie">';
+  if(total <= 0){
+    // Empty ring
+    svg += '<circle cx="100" cy="100" r="80" fill="#ede5f3"/>';
+    svg += '<circle cx="100" cy="100" r="52" fill="#fff"/>';
+  } else {
+    let acc = 0;
+    valid.forEach((s,i)=>{
+      if(s._v <= 0) return;
+      const frac = s._v/total;
+      const a0 = acc * 2*Math.PI - Math.PI/2;
+      const a1 = (acc+frac) * 2*Math.PI - Math.PI/2;
+      acc += frac;
+      const x0 = cx + r*Math.cos(a0), y0 = cy + r*Math.sin(a0);
+      const x1 = cx + r*Math.cos(a1), y1 = cy + r*Math.sin(a1);
+      const xi0 = cx + ir*Math.cos(a0), yi0 = cy + ir*Math.sin(a0);
+      const xi1 = cx + ir*Math.cos(a1), yi1 = cy + ir*Math.sin(a1);
+      const large = (frac > 0.5) ? 1 : 0;
+      // Use a near-full path if a single segment is 100%
+      const isFull = frac >= 0.999;
+      let d;
+      if(isFull){
+        d = 'M '+(cx+r)+' '+cy+' A '+r+' '+r+' 0 1 1 '+(cx-r)+' '+cy+' A '+r+' '+r+' 0 1 1 '+(cx+r)+' '+cy+' Z M '+(cx+ir)+' '+cy+' A '+ir+' '+ir+' 0 1 0 '+(cx-ir)+' '+cy+' A '+ir+' '+ir+' 0 1 0 '+(cx+ir)+' '+cy+' Z';
+      } else {
+        d = 'M '+x0+' '+y0+' A '+r+' '+r+' 0 '+large+' 1 '+x1+' '+y1+' L '+xi1+' '+yi1+' A '+ir+' '+ir+' 0 '+large+' 0 '+xi0+' '+yi0+' Z';
+      }
+      const color = colors[i % colors.length];
+      svg += '<path d="'+d+'" fill="'+color+'" fill-rule="evenodd"><title>'+escapeHtml(s.name)+': '+fmtINR0(s.value||0)+' ('+(frac*100).toFixed(1)+'%)</title></path>';
+    });
+  }
+  svg += '</svg>';
+  const totalDisplay = (total>0)?fmtINR0(total):'&mdash;';
+  pieNode.innerHTML = svg + '<div class="rmp-center"><div class="rmp-c-lbl">Total</div><div class="rmp-c-val">'+totalDisplay+'</div></div>';
+
+  // Legend
+  if(total <= 0){
+    legendNode.innerHTML = '<div class="rml-empty">No revenue recorded for this period.</div>';
+    return;
+  }
+  legendNode.innerHTML = valid.map((s,i)=>{
+    const pct = total>0 ? (s._v/total*100) : 0;
+    const valStr = (s.value==null||isNaN(s.value))?'&mdash;':fmtINR0(s.value);
+    return '<div class="rml-row"><span class="rml-sw" style="background:'+colors[i%colors.length]+'"></span><span class="rml-name">'+escapeHtml(s.name)+'</span><span class="rml-val">'+valStr+'</span><span class="rml-pct">'+pct.toFixed(1)+'%</span></div>';
+  }).join('');
+}
+
+const state={rows:[],totals:{orders:null,revenue:null,rowCount:0},pae:null,summary:null,summaryError:null,filter:localStorage.getItem(STORAGE_KEY+":filter")||"all",sort:JSON.parse(localStorage.getItem(STORAGE_KEY+":sort")||'{"key":"cpl","dir":"asc"}')};
 
 const isUnder=r=>(r.lifetime.cpl!=null&&r.lifetime.cpl>150)||(r.lifetime.ctr!=null&&r.lifetime.ctr<1);
 const isTop=r=>(r.lifetime.cpl!=null&&r.lifetime.cpl<=150)&&(r.lifetime.ctr!=null&&r.lifetime.ctr>=1);
@@ -687,10 +1221,10 @@ function renderTable(){
   tbody.innerHTML=html;el("dt").style.display="";el("loader").style.display="none";
 }
 
-document.querySelectorAll("#chips .chip").forEach(b=>{b.addEventListener("click",()=>{state.filter=b.dataset.filter;localStorage.setItem(STORAGE_KEY+":filter",state.filter);renderTable();});});
-document.querySelectorAll("#dt thead th.sortable").forEach(th=>{th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sort.key===k)state.sort.dir=state.sort.dir==="asc"?"desc":"asc";else{state.sort.key=k;state.sort.dir="asc";}localStorage.setItem(STORAGE_KEY+":sort",JSON.stringify(state.sort));renderTable();});});
+document.querySelectorAll("#chips .chip").forEach(b=>{b.addEventListener("click",()=>{state.filter=b.dataset.filter;localStorage.setItem(STORAGE_KEY+":filter",state.filter);if(summaryError){showError("Summary Dashboard not loaded",summaryError+"\n\nFix: open the workbook → click the \"Summary Dashboard\" tab → copy the number after gid= from the URL and send it to me.","warn");}renderTable();renderSummaryFunnel();});});
+document.querySelectorAll("#dt thead th.sortable").forEach(th=>{th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sort.key===k)state.sort.dir=state.sort.dir==="asc"?"desc":"asc";else{state.sort.key=k;state.sort.dir="asc";}localStorage.setItem(STORAGE_KEY+":sort",JSON.stringify(state.sort));if(summaryError){showError("Summary Dashboard not loaded",summaryError+"\n\nFix: open the workbook → click the \"Summary Dashboard\" tab → copy the number after gid= from the URL and send it to me.","warn");}renderTable();renderSummaryFunnel();});});
 
-async function loadFromCowork(){const resp=await window.cowork.callMcpTool(DRIVE_TOOL,{fileId:FILE_ID});const content=extractFileContent(resp);if(!content||content.length<1000)throw new Error("Drive MCP returned empty / truncated content.");return{ceRows:parsePrivyrFromNL(content),agrRows:parseAGRFromNL(content),pae:parsePAEFromNL(content)};}
+async function loadFromCowork(){const resp=await window.cowork.callMcpTool(DRIVE_TOOL,{fileId:FILE_ID});const content=extractFileContent(resp);if(!content||content.length<1000)throw new Error("Drive MCP returned empty / truncated content.");let summary=null,summaryError=null;try{summary=parseSummaryFromNL(content);}catch(e){summaryError=e&&e.message?e.message:String(e);}return{ceRows:parsePrivyrFromNL(content),agrRows:parseAGRFromNL(content),pae:parsePAEFromNL(content),summary,summaryError};}
 
 async function discoverGidForTab(tabName){let html="";try{const r=await fetch(PUBHTML_URL,{method:"GET",cache:"no-store"});if(!r.ok)return null;html=await r.text();}catch(e){return null;}if(!html)return null;const escaped=tabName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const patterns=[new RegExp('"name":"'+escaped+'"\\s*,\\s*"gid":"?(\\d+)','i'),new RegExp('"gid":"?(\\d+)"?\\s*,\\s*"name":"'+escaped+'"','i'),new RegExp('id="sheet-button-(\\d+)"[^>]*>[^<]*'+escaped,'i'),new RegExp('gid=(\\d+)[^>]*>[^<]*'+escaped,'i')];for(const re of patterns){const m=re.exec(html);if(m&&m[1])return m[1];}return null;}
 
@@ -715,10 +1249,13 @@ async function loadFromPublicCSV(){
   let pae = null, paeError = null;
   try { pae = parsePAEFromCSV(await fetchCSV(PAE_GID, "PAE")); }
   catch (e) { paeError = "PAE fetch failed: " + (e.message || e); }
-  return { ceRows, agrRows, agrError, pae, paeError };
+  let summary = null, summaryError = null;
+  try { summary = parseSummaryFromCSV(await fetchCSV(SUMMARY_GID, "Summary")); }
+  catch (e) { summaryError = "Summary fetch failed: " + (e.message || e); }
+  return { ceRows, agrRows, agrError, pae, paeError, summary, summaryError };
 }
 
-async function load(){setStamp();const inCowork=!!(window.cowork&&typeof window.cowork.callMcpTool==="function");let bundle;try{bundle=inCowork?await loadFromCowork():await loadFromPublicCSV();}catch(err){const msg=err&&err.message?err.message:String(err);if(inCowork){showError("Couldn't load via Cowork's Drive MCP",msg);}else{showError("Couldn't fetch the published CSV",msg+"\n\nIf this is a CORS/network error in a file:// page, try a tiny local server:\n  python -m http.server 8000\nand open http://localhost:8000/privyr-creative-effectiveness.html\n\nAlso confirm the workbook is still set to File → Share → Publish to web,\nand that gid="+SHEET_GID+" is the Privyr CE tab.");}return;}const{ceRows,agrRows,agrError,pae,paeError}=bundle;if(!ceRows.length){showError("No active rows found",'The Privyr CE tab returned 0 rows where column F = "active".');return;}const agrMap=buildAGRMap(agrRows);mergeAGRIntoCE(ceRows,agrMap);state.rows=ceRows;state.totals=privyrTotals(agrRows);state.pae=pae||null;if(agrError){showError("Orders / Revenue (per-ad) not loaded",agrError+"\n\nFix: open the workbook → click the \"Ad Generated Revenue\" tab → look at the URL — the number after gid= is the value we need.","warn");}if(paeError){showError("Top-card period totals not loaded",paeError+"\n\nFix: open the workbook → click the \"Platform Ad Efficiency_Mktg\" tab → copy the number after gid= from the URL and send it to me.","warn");}renderTable();}
+async function load(){setStamp();const inCowork=!!(window.cowork&&typeof window.cowork.callMcpTool==="function");let bundle;try{bundle=inCowork?await loadFromCowork():await loadFromPublicCSV();}catch(err){const msg=err&&err.message?err.message:String(err);if(inCowork){showError("Couldn't load via Cowork's Drive MCP",msg);}else{showError("Couldn't fetch the published CSV",msg+"\n\nIf this is a CORS/network error in a file:// page, try a tiny local server:\n  python -m http.server 8000\nand open http://localhost:8000/privyr-creative-effectiveness.html\n\nAlso confirm the workbook is still set to File → Share → Publish to web,\nand that gid="+SHEET_GID+" is the Privyr CE tab.");}return;}const{ceRows,agrRows,agrError,pae,paeError,summary,summaryError}=bundle;if(!ceRows.length){showError("No active rows found",'The Privyr CE tab returned 0 rows where column F = "active".');return;}const agrMap=buildAGRMap(agrRows);mergeAGRIntoCE(ceRows,agrMap);state.rows=ceRows;state.totals=privyrTotals(agrRows);state.pae=pae||null;state.summary=summary||null;state.summaryError=summaryError||null;if(agrError){showError("Orders / Revenue (per-ad) not loaded",agrError+"\n\nFix: open the workbook → click the \"Ad Generated Revenue\" tab → look at the URL — the number after gid= is the value we need.","warn");}if(paeError){showError("Top-card period totals not loaded",paeError+"\n\nFix: open the workbook → click the \"Platform Ad Efficiency_Mktg\" tab → copy the number after gid= from the URL and send it to me.","warn");}if(summaryError){showError("Summary Dashboard not loaded",summaryError+"\n\nFix: open the workbook → click the \"Summary Dashboard\" tab → copy the number after gid= from the URL and send it to me.","warn");}renderTable();renderSummaryFunnel();}
 
 // SVG icons for funnel steps (Lucide-style, currentColor, 2px stroke)
 const F_ICONS={
@@ -850,8 +1387,49 @@ document.querySelectorAll('.top-tab-btn').forEach(btn=>{
     document.querySelectorAll('.top-content').forEach(c=>{
       c.classList.toggle('active',c.id==='top-'+t);
     });
+    if(t==='summary') renderSummaryFunnel();
   });
 });
+
+// === Revenue modal interactions ===
+(function(){
+  const m = document.getElementById('rev-modal'); if(!m) return;
+  // Close on backdrop or X click
+  m.addEventListener('click', (ev)=>{
+    if(ev.target && ev.target.dataset && ev.target.dataset.rmClose) closeRevenueModal();
+  });
+  // Close on Escape
+  document.addEventListener('keydown', (ev)=>{
+    if(ev.key==='Escape' && m.classList.contains('open')) closeRevenueModal();
+  });
+  // Period buttons
+  m.querySelectorAll('.rm-pt-btn').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      _modalState.period = b.dataset.period;
+      m.querySelectorAll('.rm-pt-btn').forEach(x=>{
+        const on = x===b;
+        x.classList.toggle('active', on);
+        x.setAttribute('aria-selected', on?'true':'false');
+      });
+      renderRevenueModal();
+    });
+  });
+  // Source tabs
+  m.querySelectorAll('.rm-st-btn').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      _modalState.source = b.dataset.source;
+      m.querySelectorAll('.rm-st-btn').forEach(x=>{
+        const on = x===b;
+        x.classList.toggle('active', on);
+        x.setAttribute('aria-selected', on?'true':'false');
+      });
+      m.querySelectorAll('.rm-pane').forEach(p=>{
+        p.classList.toggle('active', p.dataset.pane === _modalState.source);
+      });
+    });
+  });
+})();
+
 
 load();
 })();
