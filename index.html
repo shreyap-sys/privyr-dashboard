@@ -45,6 +45,18 @@
   .card.group .gv.muted{color:var(--ink-muted);font-weight:500}
   .card.solo{display:flex;flex-direction:column;justify-content:center}
   .card.solo .val{font-size:32px;line-height:1.1;margin-top:2px}
+  /* Section nav (Summary / Privyr / Website) — underline tabs */
+  .top-tabs{display:flex;gap:6px;margin:0 0 22px;border-bottom:1px solid var(--line);position:relative}
+  .top-tab-btn{padding:10px 22px;border:none;background:transparent;color:var(--ink-soft);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 120ms ease;letter-spacing:.01em}
+  .top-tab-btn:hover:not(.active){color:#6f2da8}
+  .top-tab-btn.active{color:#6f2da8;border-bottom-color:#6f2da8}
+  .top-content{display:none}
+  .top-content.active{display:block}
+  /* Placeholder card for sections we haven't built yet */
+  .placeholder-card{background:var(--panel);border:1px dashed var(--line);border-radius:var(--radius);padding:60px 32px;text-align:center;box-shadow:var(--shadow);margin:8px 0}
+  .placeholder-card .pc-title{font-size:18px;font-weight:600;color:var(--ink);letter-spacing:-0.01em;margin-bottom:6px}
+  .placeholder-card .pc-sub{font-size:13px;color:var(--ink-muted);max-width:480px;margin:0 auto;line-height:1.5}
+  .placeholder-card .pc-pill{display:inline-block;margin-top:14px;padding:5px 12px;background:#f6f0fb;color:#6f2da8;border-radius:999px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
   /* Top-level tabs (Overview / Funnel) */
   .tabs{display:flex;gap:8px;margin:0 0 18px}
   .tab-btn{padding:9px 18px;border:1px solid var(--line);background:var(--panel);color:var(--ink-soft);font-size:13px;font-weight:600;cursor:pointer;border-radius:999px;transition:all 120ms ease;font-family:inherit}
@@ -186,7 +198,22 @@
       <div>Currency: INR</div>
     </div>
   </header>
-      <div class="tabs" role="tablist" aria-label="Dashboard view">
+      <div class="top-tabs" role="tablist" aria-label="Section">
+    <button class="top-tab-btn" data-top-tab="summary" role="tab" aria-selected="false">Summary</button>
+    <button class="top-tab-btn active" data-top-tab="privyr" role="tab" aria-selected="true">Privyr</button>
+    <button class="top-tab-btn" data-top-tab="website" role="tab" aria-selected="false">Website</button>
+  </div>
+
+  <div id="top-summary" class="top-content" role="tabpanel">
+    <div class="placeholder-card">
+      <div class="pc-title">Summary view</div>
+      <div class="pc-sub">A high-level cross-platform summary will live here — combining Privyr and Website performance into a single executive snapshot. Coming next.</div>
+      <div class="pc-pill">Coming soon</div>
+    </div>
+  </div>
+
+  <div id="top-privyr" class="top-content active" role="tabpanel">
+  <div class="tabs" role="tablist" aria-label="Dashboard view">
     <button class="tab-btn active" data-tab="overview" role="tab" aria-selected="true">Overview</button>
     <button class="tab-btn" data-tab="funnel" role="tab" aria-selected="false">Funnel</button>
   </div>
@@ -367,10 +394,33 @@
     <div class="funnel-empty">Loading funnel…</div>
   </div>
 
+  </div> <!-- /#top-privyr -->
+
+  <div id="top-website" class="top-content" role="tabpanel">
+    <div class="tabs" role="tablist" aria-label="Website dashboard view">
+      <button class="tab-btn active" data-tab="overview" role="tab" aria-selected="true">Overview</button>
+      <button class="tab-btn" data-tab="funnel" role="tab" aria-selected="false">Funnel</button>
+    </div>
+    <div data-tab-id="overview" class="tab-content active" role="tabpanel">
+      <div class="placeholder-card">
+        <div class="pc-title">Website &middot; Overview</div>
+        <div class="pc-sub">Cards and per-ad table for the Website ECF (DoubleTick / Brevo) campaigns will sit here &mdash; same shape as Privyr Overview, sourced from the matching tabs in your sheet.</div>
+        <div class="pc-pill">Coming soon</div>
+      </div>
+    </div>
+    <div data-tab-id="funnel" class="tab-content" role="tabpanel">
+      <div class="placeholder-card">
+        <div class="pc-title">Website &middot; Funnel</div>
+        <div class="pc-sub">Three-period customer journey for Website ECF will live here &mdash; same layout as the Privyr funnel.</div>
+        <div class="pc-pill">Coming soon</div>
+      </div>
+    </div>
+  </div>
+
 </div>
 <script>
 (()=>{"use strict";
-const STORAGE_KEY="privyr-creative-effectiveness:v10";
+const STORAGE_KEY="privyr-creative-effectiveness:v11";
 const FILE_ID="1vE4GY-6l2YIBz5rWy6uKvHc8ReuFwBgS";
 const DRIVE_TOOL="mcp__66fa5073-4346-419f-88aa-c11cfb492155__read_file_content";
 const PUB_BASE="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDP0_BGmMv5wOX8VsPgLQ2EUkcRnYZOrl-4X0jAhFVAHkSGTh2Jx1ltQ671ALGOA/pub";
@@ -775,15 +825,31 @@ function renderFunnelColumn(pae,pk){
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     const t=btn.dataset.tab;
-    document.querySelectorAll('.tab-btn').forEach(b=>{
+    const section=btn.closest('.top-content')||document;
+    section.querySelectorAll('.tab-btn').forEach(b=>{
       const on=(b===btn);
       b.classList.toggle('active',on);
       b.setAttribute('aria-selected',on?'true':'false');
     });
-    document.querySelectorAll('.tab-content').forEach(c=>{
-      c.classList.toggle('active',c.id==='tab-'+t);
+    section.querySelectorAll('.tab-content').forEach(c=>{
+      const matches=(c.id==='tab-'+t)||(c.dataset && c.dataset.tabId===t);
+      c.classList.toggle('active',matches);
     });
-    if(t==='funnel') renderFunnel();
+    if(t==='funnel' && section.id==='top-privyr') renderFunnel();
+  });
+});
+
+document.querySelectorAll('.top-tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const t=btn.dataset.topTab;
+    document.querySelectorAll('.top-tab-btn').forEach(b=>{
+      const on=(b===btn);
+      b.classList.toggle('active',on);
+      b.setAttribute('aria-selected',on?'true':'false');
+    });
+    document.querySelectorAll('.top-content').forEach(c=>{
+      c.classList.toggle('active',c.id==='top-'+t);
+    });
   });
 });
 
@@ -792,4 +858,3 @@ load();
 </script>
 </body>
 </html>
-  
