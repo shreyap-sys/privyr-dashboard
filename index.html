@@ -110,8 +110,8 @@
   .funnel-step.revenue > *{position:relative;z-index:1}
   .funnel-step.revenue .fs-icon{background:rgba(255,255,255,0.25);color:#fff;box-shadow:0 0 14px rgba(255,255,255,0.18),inset 0 1px 0 rgba(255,255,255,0.4)}
   .funnel-step.revenue .fs-label{color:rgba(255,255,255,0.92)}
-  .funnel-step.revenue{padding:14px 18px;align-items:center}
-  .funnel-step.revenue .fs-value{color:#fff;font-size:24px;text-shadow:0 1px 2px rgba(0,0,0,0.18);text-align:right}
+  .funnel-step.revenue{padding:14px 18px;align-items:center;column-gap:18px}
+  .funnel-step.revenue .fs-value{color:#fff;font-size:22px;text-shadow:0 1px 2px rgba(0,0,0,0.18);text-align:right;min-width:max-content;padding-left:6px}
   .funnel-step.revenue .fs-label{font-size:10.5px;letter-spacing:.08em}
   /* ROAS prominent block on the right side of the revenue card */
   .funnel-step.revenue .revenue-roas{display:flex;flex-direction:column;align-items:flex-end;padding-left:16px;border-left:1px solid rgba(255,255,255,0.38);min-width:62px}
@@ -199,8 +199,9 @@
   .funnel-step.revenue.clickable{cursor:pointer;transition:transform 140ms ease,box-shadow 140ms ease}
   .funnel-step.revenue.clickable:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(111,45,168,.42),inset 0 1px 0 rgba(255,255,255,.32)}
   .funnel-step.revenue.clickable::after,.funnel-step.revenue.clickable::before{pointer-events:none}
-  /* Label group — stacks the LABEL and the "click to drill down" hint */
-  .fs-label-group{display:flex;flex-direction:column;gap:3px;min-width:0}
+  /* Label group — stacks the LABEL and the "click to drill down" hint.
+     min-width:max-content keeps the column from shrinking under the hint text. */
+  .fs-label-group{display:flex;flex-direction:column;gap:3px;min-width:max-content}
   /* "click to drill down" hint sits right under the label, normal-cased, lighter */
   .funnel-step.revenue .rm-hint{position:relative;z-index:1;font-size:10.5px;font-weight:600;letter-spacing:.02em;text-transform:none;opacity:.78;color:rgba(255,255,255,.92);display:inline-flex;align-items:center;gap:4px;margin:0;padding:0;border:none;white-space:nowrap}
   .funnel-step.revenue .rm-hint svg{width:11px;height:11px}
@@ -221,9 +222,10 @@
 
   /* Two-up Orders/AOV/CAC mini-grid for Total Revenue card */
   /* Side-meta grid: sits to the RIGHT of the revenue value (4th grid cell of .funnel-step) */
-  .rev-mini-grid{display:grid;grid-template-columns:auto auto;gap:4px 14px;position:relative;z-index:1;padding-left:16px;border-left:1px solid rgba(255,255,255,.38);text-align:right;min-width:max-content}
-  .rev-mini-grid .rmg-item .lbl{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.78);text-transform:uppercase;letter-spacing:.08em;line-height:1.1}
-  .rev-mini-grid .rmg-item .val{font-size:14px;font-weight:800;color:#fff;line-height:1.1;margin-top:1px;font-variant-numeric:tabular-nums}
+  .rev-mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(50px,auto));grid-auto-flow:column;gap:0 14px;position:relative;z-index:1;padding-left:16px;border-left:1px solid rgba(255,255,255,.38);text-align:right;min-width:max-content;align-items:center}
+  .rev-mini-grid .rmg-item{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+  .rev-mini-grid .rmg-item .lbl{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.78);text-transform:uppercase;letter-spacing:.08em;line-height:1}
+  .rev-mini-grid .rmg-item .val{font-size:14px;font-weight:800;color:#fff;line-height:1.1;font-variant-numeric:tabular-nums}
   .rev-mini-grid.single{grid-template-columns:auto;min-width:62px}
 
   /* Stack the 3 revenue cards tightly inside a column */
