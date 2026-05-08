@@ -1554,14 +1554,16 @@ function drawPie(pieNode, legendNode, segments, colors, totalOverride){
 const state={rows:[],totals:{orders:null,revenue:null,rowCount:0},pae:null,summary:null,summaryError:null,filter:localStorage.getItem(STORAGE_KEY+":filter")||"all",sort:JSON.parse(localStorage.getItem(STORAGE_KEY+":sort")||'{"key":"cpl","dir":"asc"}'),website:{rows:[],totals:{orders:null,revenue:null,rowCount:0},pae:null,filter:localStorage.getItem(STORAGE_KEY+":ws-filter")||"all",sort:JSON.parse(localStorage.getItem(STORAGE_KEY+":ws-sort")||'{"key":"cpl","dir":"asc"}')}};
 
 // Website filter helpers (CPL > 300 OR CTR < 1% = under, both within = top)
-const isWsUnder = r => (r.lifetime.cpl!=null && r.lifetime.cpl>WS_CPL_THRESHOLD) || (r.lifetime.ctr!=null && r.lifetime.ctr<WS_CTR_THRESHOLD);
-const isWsTop = r => (r.lifetime.cpl!=null && r.lifetime.cpl<=WS_CPL_THRESHOLD) && (r.lifetime.ctr!=null && r.lifetime.ctr>=WS_CTR_THRESHOLD);
+// Website filter — qualify by L30 (Last 30 days) metrics only.
+const isWsUnder = r => (r.l30.cpl!=null && r.l30.cpl>WS_CPL_THRESHOLD) || (r.l30.ctr!=null && r.l30.ctr<WS_CTR_THRESHOLD);
+const isWsTop = r => (r.l30.cpl!=null && r.l30.cpl<=WS_CPL_THRESHOLD) && (r.l30.ctr!=null && r.l30.ctr>=WS_CTR_THRESHOLD);
 const applyWsFilter = (rows,f) => f==="under"?rows.filter(isWsUnder):f==="top"?rows.filter(isWsTop):rows.slice();
 const cplPillWs = v => pill(v,(v!=null && v<=WS_CPL_THRESHOLD)?"sage":(v==null?"neutral":"rose"),fmtINR0);
 
 
-const isUnder=r=>(r.lifetime.cpl!=null&&r.lifetime.cpl>150)||(r.lifetime.ctr!=null&&r.lifetime.ctr<1);
-const isTop=r=>(r.lifetime.cpl!=null&&r.lifetime.cpl<=150)&&(r.lifetime.ctr!=null&&r.lifetime.ctr>=1);
+// Privyr filter — qualify by L30 (Last 30 days) metrics only.
+const isUnder=r=>(r.l30.cpl!=null&&r.l30.cpl>150)||(r.l30.ctr!=null&&r.l30.ctr<1);
+const isTop=r=>(r.l30.cpl!=null&&r.l30.cpl<=150)&&(r.l30.ctr!=null&&r.l30.ctr>=1);
 const applyFilter=(rows,f)=>f==="under"?rows.filter(isUnder):f==="top"?rows.filter(isTop):rows.slice();
 
 function sortRows(rows,key,dir){const mul=dir==="asc"?1:-1;const topLevel=key==="orders"||key==="revenue";return rows.slice().sort((a,b)=>{const va=key==="ad_name"?a.ad_name:topLevel?a[key]:a.lifetime[key];const vb=key==="ad_name"?b.ad_name:topLevel?b[key]:b.lifetime[key];if(key==="ad_name")return String(va).localeCompare(String(vb))*mul;const an=va==null||isNaN(va)?Infinity:Number(va);const bn=vb==null||isNaN(vb)?Infinity:Number(vb);if(an===bn)return 0;return(an<bn?-1:1)*mul;});}
@@ -2178,4 +2180,13 @@ load();
 </script>
 </body>
 </html>
-                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                            });
+  });
+})();
+
+
+load();
+})();
+</script>
+</body>
+</html>
