@@ -143,6 +143,10 @@
   .funnel-step.revenue .revenue-roas{display:flex;flex-direction:column;align-items:flex-end;padding-left:16px;border-left:1px solid rgba(255,255,255,0.38);min-width:62px}
   .funnel-step.revenue .revenue-roas .rr-lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,0.78);font-weight:700;margin-bottom:3px;line-height:1}
   .funnel-step.revenue .revenue-roas .rr-val{font-size:22px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-0.01em;line-height:1;text-shadow:0 0 14px rgba(255,255,255,0.35),0 1px 2px rgba(0,0,0,0.15)}
+  /* Ad-set budget subtitle inside the Ad Name cell */
+  .ad-name .ad-name-main{font-weight:600;font-size:13px;color:var(--ink);line-height:1.3}
+  .ad-name .ad-set-budget{font-size:11px;font-weight:500;color:var(--ink-soft);margin-top:4px;line-height:1.25;letter-spacing:.01em}
+  .ad-name .ad-set-budget strong{color:#6f2da8;font-weight:700}
   .funnel-empty{text-align:center;padding:60px 24px;color:var(--ink-muted);font-size:13px}
   /* Subtle date suffix in the dashboard H1 */
   #dashboard-title .title-date{font-size:.62em;font-weight:600;color:#7a6892;letter-spacing:.005em;margin-left:8px;vertical-align:middle}
@@ -801,6 +805,17 @@ const fmtINR0=n=>(n==null||isNaN(n))?"—":"₹"+Math.round(n).toLocaleString("e
 const fmtPct=n=>(n==null||isNaN(n))?"—":Number(n).toFixed(2)+"%";
 const fmtInt=n=>(n==null||isNaN(n))?"—":Math.round(Number(n)).toLocaleString("en-IN");
 const fmtMult=n=>(n==null||isNaN(n))?"—":Number(n).toFixed(2)+"x";
+// Format Ad-set budget cell. The sheet may store this as a number (₹) or as raw text
+// (e.g. "Daily ₹500 / lifetime"); we keep text as-is, format pure numbers as ₹X.
+function fmtAdSetBudget(v){
+  if(v==null) return "—";
+  const s=String(v).trim();
+  if(!s) return "—";
+  // Pure numeric? (allowing commas / ₹ / decimals)
+  const n=Number(s.replace(/[₹,\s]/g,""));
+  if(!isNaN(n) && /^[₹\d.,\s]+$/.test(s)) return "₹"+Math.round(n).toLocaleString("en-IN");
+  return s;
+}
 const el=id=>document.getElementById(id);
 const escapeHtml=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 
@@ -821,9 +836,9 @@ function readPeriod(cols,off){const ctr=num(cols[off.ctr]);const spend=num(cols[
 
 const OFFSETS={lifetime:{spend:7,ctr:10,cpc:11,leads:13,valid:14,valid_pct:15,nr:16,cpl:17,cpvl:18},l30:{spend:22,ctr:25,cpc:26,leads:28,valid:29,valid_pct:30,nr:31,cpl:32,cpvl:33},l7:{spend:37,ctr:40,cpc:41,leads:43,valid:44,valid_pct:45,nr:46,cpl:47,cpvl:48}};
 
-function parsePrivyrFromCSV(csvText){const all=parseCSV(csvText);if(!all.length)throw new Error("CSV is empty.");const looksNumeric=v=>v!=null&&/\d/.test(String(v));const rows=[];let scanned=0;for(let i=0;i<all.length;i++){const cols=all[i];if(!cols)continue;scanned++;if(cols.length<19)continue;const status=(cols[5]||"").trim().toLowerCase();if(status!=="active")continue;const ad=(cols[3]||"").trim();if(!ad||ad.length<2)continue;if(!looksNumeric(cols[7]))continue;rows.push({ad_name:cleanName(cols[3]),campaign:cleanName(cols[1]),helper_key:normHelperKey(cols[6]),lifetime:readPeriod(cols,OFFSETS.lifetime),l30:readPeriod(cols,OFFSETS.l30),l7:readPeriod(cols,OFFSETS.l7),orders:null,revenue:null});}if(!rows.length){const preview=all.slice(0,12).map((r,i)=>"  row "+(i+1).toString().padStart(2)+" ["+(r?r.length:0)+"c]: "+(r||[]).slice(0,7).map(c=>JSON.stringify(c||"")).join(", ")).join("\n");throw new Error('Found 0 rows where col F = "active" ('+scanned+' scanned).\n'+preview);}return rows;}
+function parsePrivyrFromCSV(csvText){const all=parseCSV(csvText);if(!all.length)throw new Error("CSV is empty.");const looksNumeric=v=>v!=null&&/\d/.test(String(v));const rows=[];let scanned=0;for(let i=0;i<all.length;i++){const cols=all[i];if(!cols)continue;scanned++;if(cols.length<19)continue;const status=(cols[5]||"").trim().toLowerCase();if(status!=="active")continue;const ad=(cols[3]||"").trim();if(!ad||ad.length<2)continue;if(!looksNumeric(cols[7]))continue;rows.push({ad_name:cleanName(cols[3]),campaign:cleanName(cols[1]),ad_set_budget:cleanName(cols[4]),helper_key:normHelperKey(cols[6]),lifetime:readPeriod(cols,OFFSETS.lifetime),l30:readPeriod(cols,OFFSETS.l30),l7:readPeriod(cols,OFFSETS.l7),orders:null,revenue:null});}if(!rows.length){const preview=all.slice(0,12).map((r,i)=>"  row "+(i+1).toString().padStart(2)+" ["+(r?r.length:0)+"c]: "+(r||[]).slice(0,7).map(c=>JSON.stringify(c||"")).join(", ")).join("\n");throw new Error('Found 0 rows where col F = "active" ('+scanned+' scanned).\n'+preview);}return rows;}
 
-function parsePrivyrFromNL(content){const headerRe=/Date Range,Campaign name,Ad set name/g;const heads=[];let m;while((m=headerRe.exec(content))!==null)heads.push(m.index);if(heads.length<3){throw new Error("Privyr CE tab not found (need ≥3 'Date Range' headers, got "+heads.length+").");}const start=heads[2];const section=content.slice(start);const rowParts=section.split(/(?=1st [A-Z][a-z]+ \d{4} - \d+(?:st|nd|rd|th) [A-Z][a-z]+ \d{4},)/);const rows=[];for(let i=1;i<rowParts.length;i++){let piece=rowParts[i];if(/Date Range,Campaign name/.test(piece)){const cut=piece.search(/Date Range,Campaign name/);if(cut>0)piece=piece.slice(0,cut);else continue;}const cols=parseCsvRow(piece);if(cols.length<49)continue;const status=(cols[5]||"").trim().toLowerCase();if(status!=="active")continue;rows.push({ad_name:cleanName(cols[3]),campaign:cleanName(cols[1]),helper_key:normHelperKey(cols[6]),lifetime:readPeriod(cols,OFFSETS.lifetime),l30:readPeriod(cols,OFFSETS.l30),l7:readPeriod(cols,OFFSETS.l7),orders:null,revenue:null});}return rows.filter(r=>r.ad_name&&r.ad_name.length>1);}
+function parsePrivyrFromNL(content){const headerRe=/Date Range,Campaign name,Ad set name/g;const heads=[];let m;while((m=headerRe.exec(content))!==null)heads.push(m.index);if(heads.length<3){throw new Error("Privyr CE tab not found (need ≥3 'Date Range' headers, got "+heads.length+").");}const start=heads[2];const section=content.slice(start);const rowParts=section.split(/(?=1st [A-Z][a-z]+ \d{4} - \d+(?:st|nd|rd|th) [A-Z][a-z]+ \d{4},)/);const rows=[];for(let i=1;i<rowParts.length;i++){let piece=rowParts[i];if(/Date Range,Campaign name/.test(piece)){const cut=piece.search(/Date Range,Campaign name/);if(cut>0)piece=piece.slice(0,cut);else continue;}const cols=parseCsvRow(piece);if(cols.length<49)continue;const status=(cols[5]||"").trim().toLowerCase();if(status!=="active")continue;rows.push({ad_name:cleanName(cols[3]),campaign:cleanName(cols[1]),ad_set_budget:cleanName(cols[4]),helper_key:normHelperKey(cols[6]),lifetime:readPeriod(cols,OFFSETS.lifetime),l30:readPeriod(cols,OFFSETS.l30),l7:readPeriod(cols,OFFSETS.l7),orders:null,revenue:null});}return rows.filter(r=>r.ad_name&&r.ad_name.length>1);}
 
 function parseAGRFromCSV(csvText){const all=parseCSV(csvText);const out=[];for(const cols of all){if(!cols||cols.length<8)continue;const platform=(cols[0]||"").trim();if(!platform||/^platform$/i.test(platform))continue;const orders=num(cols[6]);const revenue=num(cols[7]);if(orders==null&&revenue==null)continue;out.push({platform,helper_key:normHelperKey(cols[4]),orders:orders||0,revenue:revenue||0});}return out;}
 
@@ -1642,7 +1657,7 @@ function renderTable(){
     const ordersClass=(r.orders==null||r.orders===0)?"span-cell muted":"span-cell";
     const revClass=(r.revenue==null||r.revenue===0)?"span-cell muted":"span-cell";
     html+='<tr class="section-header">'+'<td class="sh-ad-name">#'+(idx+1)+' · '+escapeHtml(r.ad_name).slice(0,40)+(r.ad_name.length>40?"…":"")+'</td>'+'<td>Period</td>'+'<td class="sh-num">Spend (₹)</td>'+'<td class="sh-num">CTR</td>'+'<td class="sh-num">CPL</td>'+'<td class="sh-num">Leads</td>'+'<td class="sh-num">Valid Leads</td>'+'<td class="sh-num">Valid %</td>'+'<td class="sh-num">NR Leads</td>'+'<td class="sh-num">CPVL</td>'+'<td class="sh-num">Orders</td>'+'<td class="sh-num">Revenue</td>'+'</tr>';html+='<tr class="block-start row-life">'
-      +'<td class="ad-name" rowspan="5">'+escapeHtml(r.ad_name)+'</td>'
+      +'<td class="ad-name" rowspan="5"><div class="ad-name-main">'+escapeHtml(r.ad_name)+'</div><div class="ad-set-budget">Ad-set budget: <strong>'+escapeHtml(fmtAdSetBudget(r.ad_set_budget))+'</strong></div></td>'
       +'<td class="period">Lifetime</td>'
       +'<td class="num">'+fmtINR0(r.lifetime.spend)+'</td>'
       +'<td class="num">'+ctrPill(r.lifetime.ctr)+'</td>'
@@ -1793,7 +1808,7 @@ function renderWebsiteTable(){
       +'<td class="sh-num">Revenue</td>'
       +'</tr>';
     h += '<tr class="block-start row-life">'
-      +'<td class="ad-name" rowspan="5">'+escapeHtml(r.ad_name)+'</td>'
+      +'<td class="ad-name" rowspan="5"><div class="ad-name-main">'+escapeHtml(r.ad_name)+'</div><div class="ad-set-budget">Ad-set budget: <strong>'+escapeHtml(fmtAdSetBudget(r.ad_set_budget))+'</strong></div></td>'
       +'<td class="period">Lifetime</td>'
       +'<td class="num">'+fmtINR0(r.lifetime.spend)+'</td>'
       +'<td class="num">'+ctrPill(r.lifetime.ctr)+'</td>'
@@ -2171,16 +2186,6 @@ document.querySelectorAll('.top-tab-btn').forEach(btn=>{
         p.classList.toggle('active', p.dataset.pane === _modalState.source);
       });
     });
-  });
-})();
-
-
-load();
-})();
-</script>
-</body>
-</html>
-                                                                                                                                                                                                                                                                                                                            });
   });
 })();
 
