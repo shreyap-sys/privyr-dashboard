@@ -205,6 +205,11 @@
   .pill.rose.ml-fail{font-weight:800;letter-spacing:.01em}
   .ml-warn{color:#dc2626;font-weight:700}
   .ml-warn .ml-num{color:#b91c1c;font-weight:900;font-size:1.05em}
+  /* Recommended Action pill emphasis */
+  .pill.sage.ra-pill,.pill.rose.ra-pill,.pill.amber.ra-pill,.pill.neutral.ra-pill{font-weight:800;letter-spacing:.01em;padding:3px 10px}
+  .row-action .detail{color:var(--ink-soft)}
+  .row-action .detail strong{color:var(--ink);font-weight:700}
+  .row-action .l7-thin{font-size:11px;color:var(--ink-muted);font-style:italic;margin-left:4px}
   .info-row td.info{padding:10px 14px;font-size:12.5px;color:var(--ink-soft)}
   .info-row .lbl{display:inline-block;min-width:162px;font-weight:600;color:var(--ink);margin-right:8px;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
   .info-row .detail{color:var(--ink-soft)}
@@ -1591,6 +1596,66 @@ function metaLearning(r){const wkLeads=r.l7.leads;if(wkLeads==null){return{html:
 
 function recommendedBudget(r){let cpl=r.l30.cpl,basis="Last 30 days";if(cpl==null||isNaN(cpl)||cpl<=0){cpl=r.lifetime.cpl;basis="Lifetime (L30 had no leads)";}if(cpl==null||isNaN(cpl)||cpl<=0){return{html:'<span class="pill neutral">—</span>',detail:"No CPL available to compute a recommendation."};}const weekly=META_LEARNING_THRESHOLD*cpl;const daily=weekly/7;const tag='<span class="pill neutral">'+fmtINR0(weekly)+'/wk</span>';const detail='<span class="strong">'+fmtINR0(weekly)+'/wk</span> &nbsp;·&nbsp; <span class="strong">'+fmtINR0(daily)+'/day</span> &nbsp;to hit '+META_LEARNING_THRESHOLD+' leads/week at '+basis+' CPL <span class="strong">'+fmtINR0(cpl)+'</span>.';return{html:tag,detail};}
 
+function recommendedAction(r){
+  const safeNum = v => (v==null || isNaN(v)) ? null : Number(v);
+  const lifeCpl  = safeNum(r.lifetime.cpl),  l30Cpl  = safeNum(r.l30.cpl),  l7Cpl  = safeNum(r.l7.cpl);
+  const lifeL2v  = safeNum(r.lifetime.valid_pct), l30L2v = safeNum(r.l30.valid_pct), l7L2v = safeNum(r.l7.valid_pct);
+  const lifeCpvl = safeNum(r.lifetime.cpvl), l30Cpvl = safeNum(r.l30.cpvl), l7Cpvl = safeNum(r.l7.cpvl);
+  const l7Leads  = safeNum(r.l7.leads),  l30Leads = safeNum(r.l30.leads);
+  const l7Reliable = (l7Leads != null && l7Leads >= 3);
+  if (l30Cpl == null && lifeCpl == null){
+    return { html: '<span class="pill neutral ra-pill">Optimize & Monitor</span>',
+      detail: "Insufficient data &mdash; not enough lead volume yet to call a trend. Watch the next 7 days." };
+  }
+  const cplClimbingL30 = (l30Cpl  != null && lifeCpl != null && l30Cpl  > lifeCpl * 1.15);
+  const cplClimbingL7  = l7Reliable && (l7Cpl != null && l30Cpl != null && l7Cpl > l30Cpl * 1.15);
+  const cplClimbing    = cplClimbingL30 || cplClimbingL7;
+  const cpvlClimbingL30 = (l30Cpvl != null && lifeCpvl != null && l30Cpvl > lifeCpvl * 1.20);
+  const cpvlClimbingL7  = l7Reliable && (l7Cpvl != null && l30Cpvl != null && l7Cpvl > l30Cpvl * 1.20);
+  const cpvlClimbing    = cpvlClimbingL30 || cpvlClimbingL7;
+  const l2vDecliningL30 = (l30L2v != null && lifeL2v != null && l30L2v < lifeL2v - 5);
+  const l2vDecliningL7  = l7Reliable && (l7L2v != null && l30L2v != null && l7L2v < l30L2v - 5);
+  const l2vDeclining    = l2vDecliningL30 || l2vDecliningL7;
+  const trustedL2v = (l30Leads != null && l30Leads >= 5 && l30L2v != null) ? l30L2v : lifeL2v;
+  const l2vHealthy = (trustedL2v != null && trustedL2v >= 25);
+  let severity, action, detail;
+  if (cplClimbing && l2vDeclining){
+    severity = "fail";  action = "Pause";
+    detail = "<strong>CPL climbing</strong> and <strong>lead quality declining</strong> &mdash; efficiency and quality both deteriorating. Pause and revisit once sales process is fixed.";
+  } else if (cplClimbing){
+    if (l2vHealthy){
+      severity = "warn"; action = "Reduce Budget";
+      detail = "<strong>CPL trending upward</strong> but lead quality is healthy ("+(trustedL2v==null?'&mdash;':trustedL2v.toFixed(1)+'%')+" L2V). Reduce budget to slow the burn and reassess in 7 days.";
+    } else {
+      severity = "fail"; action = "Pause";
+      detail = "<strong>CPL climbing</strong> and L2V below the 25% threshold ("+(trustedL2v==null?'&mdash;':trustedL2v.toFixed(1)+'%')+"). Not efficient for current capacity &mdash; pause.";
+    }
+  } else if (l2vDeclining){
+    if (cpvlClimbing){
+      severity = "warn"; action = "Reduce Budget";
+      detail = "<strong>Lead quality declining</strong> while CPVL climbs &mdash; valid leads getting more expensive. Reduce spend and review audience/creative.";
+    } else {
+      severity = "warn"; action = "Optimize & Monitor";
+      detail = "<strong>Lead quality declining</strong> over time. Narrow audience or refresh creative; watch CPVL over the next 7 days.";
+    }
+  } else if (cpvlClimbing && !l2vHealthy){
+    severity = "warn"; action = "Test Adjustment";
+    detail = "<strong>CPVL trending up</strong> with sub-25% L2V. Test a tighter audience / lower bid / creative refresh and observe for 7 days.";
+  } else if (l2vHealthy){
+    severity = "pass"; action = "Maintain";
+    detail = "Stable CPL, healthy lead quality ("+(trustedL2v==null?'&mdash;':trustedL2v.toFixed(1)+'%')+" L2V). Keep budget as-is.";
+  } else {
+    severity = "warn"; action = "Optimize & Monitor";
+    detail = "Mixed signals &mdash; CPL hasn't trended up but L2V is below 25%. Monitor quality over the next 7 days before scaling.";
+  }
+  if (l7Leads != null && !l7Reliable){
+    detail += ' <em class="l7-thin">L7 sample thin ('+Math.round(l7Leads)+' leads) &mdash; relying on L30/Lifetime.</em>';
+  }
+  const pillClass = severity === "pass" ? "sage" : (severity === "fail" ? "rose" : (severity === "warn" ? "amber" : "neutral"));
+  const html = '<span class="pill '+pillClass+' ra-pill">'+action+'</span>';
+  return { html, detail };
+}
+
 function renderCards(all){
   el("m-active").textContent=all.length.toLocaleString("en-IN");
   const periods=["lifetime","l30","l7"];
@@ -1652,6 +1717,7 @@ function renderTable(){
   sorted.forEach((r,idx)=>{
     const learn=metaLearning(r);
     const budget=recommendedBudget(r);
+    const action=recommendedAction(r);
     const ordersTxt=(r.orders==null)?'<span class="span-cell-inner muted">—</span>':fmtInt(r.orders);
     const revenueTxt=(r.revenue==null||r.revenue===0)?'<span class="span-cell-inner muted">—</span>':fmtINR0(r.revenue);
     const ordersClass=(r.orders==null||r.orders===0)?"span-cell muted":"span-cell";
@@ -1693,7 +1759,8 @@ function renderTable(){
       +'<td class="num">'+pill(r.l7.cpvl,"neutral",fmtINR0)+'</td>'
       +'</tr>'
       +'<tr class="info-row row-learn"><td class="info" colspan="11"><span class="lbl">Meta Learning Period</span>'+learn.html+'&nbsp;&nbsp;<span class="detail">'+learn.detail+'</span></td></tr>'
-      +'<tr class="info-row row-budget block-end"><td class="info" colspan="11"><span class="lbl">Recommended Budget</span>'+budget.html+'&nbsp;&nbsp;<span class="detail">'+budget.detail+'</span></td></tr>';
+      +'<tr class="info-row row-budget"><td class="info" colspan="11"><span class="lbl">Recommended Budget</span>'+budget.html+'&nbsp;&nbsp;<span class="detail">'+budget.detail+'</span></td></tr>'
+      +'<tr class="info-row row-action block-end"><td class="info" colspan="11"><span class="lbl">Recommended Action</span>'+action.html+'&nbsp;&nbsp;<span class="detail">'+action.detail+'</span></td></tr>';
   });
   tbody.innerHTML=html;el("dt").style.display="";el("loader").style.display="none";
 }
@@ -1789,6 +1856,7 @@ function renderWebsiteTable(){
   sorted.forEach((r,idx)=>{
     const learn = metaLearning(r);
     const budget = recommendedBudget(r);
+    const action = recommendedAction(r);
     const ordersTxt = (r.orders==null)?'<span class="span-cell-inner muted">&mdash;</span>':fmtInt(r.orders);
     const revenueTxt = (r.revenue==null||r.revenue===0)?'<span class="span-cell-inner muted">&mdash;</span>':fmtINR0(r.revenue);
     const ordersClass = (r.orders==null||r.orders===0)?"span-cell muted":"span-cell";
@@ -1844,7 +1912,8 @@ function renderWebsiteTable(){
       +'<td class="num">'+pill(r.l7.cpvl,"neutral",fmtINR0)+'</td>'
       +'</tr>'
       +'<tr class="info-row row-learn"><td class="info" colspan="11"><span class="lbl">Meta Learning Period</span>'+learn.html+'&nbsp;&nbsp;<span class="detail">'+learn.detail+'</span></td></tr>'
-      +'<tr class="info-row row-budget block-end"><td class="info" colspan="11"><span class="lbl">Recommended Budget</span>'+budget.html+'&nbsp;&nbsp;<span class="detail">'+budget.detail+'</span></td></tr>';
+      +'<tr class="info-row row-budget"><td class="info" colspan="11"><span class="lbl">Recommended Budget</span>'+budget.html+'&nbsp;&nbsp;<span class="detail">'+budget.detail+'</span></td></tr>'
+      +'<tr class="info-row row-action block-end"><td class="info" colspan="11"><span class="lbl">Recommended Action</span>'+action.html+'&nbsp;&nbsp;<span class="detail">'+action.detail+'</span></td></tr>';
   });
   tbody.innerHTML = h;
   el("ws-dt").style.display = "";
