@@ -1723,7 +1723,7 @@ function renderTable(){
     const ordersClass=(r.orders==null||r.orders===0)?"span-cell muted":"span-cell";
     const revClass=(r.revenue==null||r.revenue===0)?"span-cell muted":"span-cell";
     html+='<tr class="section-header">'+'<td class="sh-ad-name">#'+(idx+1)+' · '+escapeHtml(r.ad_name).slice(0,40)+(r.ad_name.length>40?"…":"")+'</td>'+'<td>Period</td>'+'<td class="sh-num">Spend (₹)</td>'+'<td class="sh-num">CTR</td>'+'<td class="sh-num">CPL</td>'+'<td class="sh-num">Leads</td>'+'<td class="sh-num">Valid Leads</td>'+'<td class="sh-num">Valid %</td>'+'<td class="sh-num">NR Leads</td>'+'<td class="sh-num">CPVL</td>'+'<td class="sh-num">Orders</td>'+'<td class="sh-num">Revenue</td>'+'</tr>';html+='<tr class="block-start row-life">'
-      +'<td class="ad-name" rowspan="5"><div class="ad-name-main">'+escapeHtml(r.ad_name)+'</div><div class="ad-set-budget">Ad-set budget: <strong>'+escapeHtml(fmtAdSetBudget(r.ad_set_budget))+'</strong></div></td>'
+      +'<td class="ad-name" rowspan="6"><div class="ad-name-main">'+escapeHtml(r.ad_name)+'</div><div class="ad-set-budget">Ad-set budget: <strong>'+escapeHtml(fmtAdSetBudget(r.ad_set_budget))+'</strong></div></td>'
       +'<td class="period">Lifetime</td>'
       +'<td class="num">'+fmtINR0(r.lifetime.spend)+'</td>'
       +'<td class="num">'+ctrPill(r.lifetime.ctr)+'</td>'
@@ -1876,7 +1876,7 @@ function renderWebsiteTable(){
       +'<td class="sh-num">Revenue</td>'
       +'</tr>';
     h += '<tr class="block-start row-life">'
-      +'<td class="ad-name" rowspan="5"><div class="ad-name-main">'+escapeHtml(r.ad_name)+'</div><div class="ad-set-budget">Ad-set budget: <strong>'+escapeHtml(fmtAdSetBudget(r.ad_set_budget))+'</strong></div></td>'
+      +'<td class="ad-name" rowspan="6"><div class="ad-name-main">'+escapeHtml(r.ad_name)+'</div><div class="ad-set-budget">Ad-set budget: <strong>'+escapeHtml(fmtAdSetBudget(r.ad_set_budget))+'</strong></div></td>'
       +'<td class="period">Lifetime</td>'
       +'<td class="num">'+fmtINR0(r.lifetime.spend)+'</td>'
       +'<td class="num">'+ctrPill(r.lifetime.ctr)+'</td>'
