@@ -210,6 +210,8 @@
   .row-action .detail{color:var(--ink-soft)}
   .row-action .detail strong{color:var(--ink);font-weight:700}
   .row-action .l7-thin{font-size:11px;color:var(--ink-muted);font-style:italic;margin-left:4px}
+  .row-action .ra-budget{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:6px;background:#f6efff;border:1px solid #e3d3f3;color:#3a2552;font-style:normal;font-size:12px;letter-spacing:.005em}
+  .row-action .ra-budget strong{color:#6f2da8;font-weight:800}
   .info-row td.info{padding:10px 14px;font-size:12.5px;color:var(--ink-soft)}
   .info-row .lbl{display:inline-block;min-width:162px;font-weight:600;color:var(--ink);margin-right:8px;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
   .info-row .detail{color:var(--ink-soft)}
@@ -1609,8 +1611,7 @@ function recommendedAction(r, scope){
   const orders   = safeNum(r.orders);
   const salesCame = orders != null && orders > 0;
 
-  // Trusted CPL: prefer L30 (≥5 leads), fall back to Lifetime. L7 alone is too noisy
-  // for a directional CPL read.
+  // Trusted CPL: prefer L30 (≥5 leads), fall back to Lifetime.
   const trustedCpl = (l30Leads != null && l30Leads >= 5 && l30Cpl != null) ? l30Cpl : lifeCpl;
   const cplHealthy = (trustedCpl != null && trustedCpl <= CPL_BENCH);
   const cplHigh    = (trustedCpl != null && trustedCpl >  CPL_BENCH);
@@ -1622,6 +1623,32 @@ function recommendedAction(r, scope){
 
   // L30 "low" volume threshold: roughly under TARGET_LO leads/wk averaged over 4 weeks.
   const l30Low = (l30Leads != null && l30Leads < TARGET_LO * 4);
+
+  // ---- Current ad-set budget (₹/day, sheet col E). Parse what we can. ----
+  function parseBudgetNum(v){
+    if (v==null) return null;
+    const s = String(v).trim();
+    if (!s) return null;
+    const n = Number(s.replace(/[₹,\s]/g,""));
+    if (!isNaN(n) && /^[₹\d.,\s]+$/.test(s)) return n;
+    return null; // non-numeric text (e.g. "Daily ₹500 / lifetime")
+  }
+  const curBudget = parseBudgetNum(r.ad_set_budget);
+  const fmtRupee = n => "₹"+Math.round(n).toLocaleString("en-IN");
+  function budgetLineFromCurrent(pct, days, verb){
+    // verb = "Reduce" / "Cap" / "Scale"
+    if (curBudget == null) return ' <em class="ra-budget">'+verb+" by ~"+pct+"% from current ad-set budget; review in "+days+" days.</em>";
+    const factor = verb === "Reduce" ? (1 - pct/100)
+                : verb === "Scale"   ? (1 + pct/100)
+                : 1; // Cap = stay at current
+    const newBudget = Math.round(curBudget * factor);
+    if (verb === "Cap"){
+      return ' <em class="ra-budget"><strong>Cap at '+fmtRupee(curBudget)+'/day</strong> for the next '+days+' days. Do not increase.</em>';
+    }
+    const delta = Math.round(curBudget * pct/100);
+    const arrow = verb === "Reduce" ? "&darr;" : "&uarr;";
+    return ' <em class="ra-budget"><strong>'+verb+' by '+pct+'%</strong> &mdash; '+fmtRupee(curBudget)+'/day '+arrow+' '+fmtRupee(newBudget)+'/day (&minus;'+(verb==="Reduce"?"":"+")+fmtRupee(delta)+'). Review in '+days+' days.</em>';
+  }
 
   // Build helper text snippets
   const cplStr = (trustedCpl==null) ? "—" : "₹"+Math.round(trustedCpl).toLocaleString("en-IN");
@@ -1643,55 +1670,58 @@ function recommendedAction(r, scope){
       detail = "L7 leads in target range ("+Math.round(l7Leads)+"/wk) and CPL healthy ("+cplStr+" ≤ "+benchStr+"). Keep as-is.";
     } else if (salesCame){
       severity = "warn"; action = "Maintain";
-      detail = "CPL above benchmark ("+cplStr+" > "+benchStr+") but <strong>"+ordStr+" sale"+(orders===1?"":"s")+" came</strong> from this ad. Maintain &mdash; scale cautiously only if sales capacity allows; otherwise cap budget.";
+      detail = "CPL above benchmark ("+cplStr+" &gt; "+benchStr+") but <strong>"+ordStr+" sale"+(orders===1?"":"s")+" came</strong> from this ad. If sales capacity allows, scale cautiously; otherwise cap budget."
+        + budgetLineFromCurrent(15, 7, "Scale");
     } else {
       severity = "warn"; action = "Reduce Budget";
-      detail = "L7 volume on target ("+Math.round(l7Leads)+"/wk) but CPL above benchmark ("+cplStr+" > "+benchStr+") and no sales attributed yet. Reduce spend.";
+      detail = "L7 volume on target ("+Math.round(l7Leads)+"/wk) but CPL above benchmark ("+cplStr+" &gt; "+benchStr+") and no sales attributed yet."
+        + budgetLineFromCurrent(30, 7, "Reduce");
     }
   }
-  // CASE B: L7 above target (>8/wk) → we already have enough volume
+  // CASE B: L7 above target (>8/wk)
   else if (l7Leads != null && l7Leads > TARGET_HI){
     if (cplHealthy){
       severity = "pass"; action = "Maintain / Cap Budget";
-      detail = "L7 volume <strong>above target</strong> ("+Math.round(l7Leads)+"/wk &gt; "+TARGET_HI+") and CPL healthy. Cap budget &mdash; do not scale; volume is already above what's needed.";
+      detail = "L7 volume <strong>above target</strong> ("+Math.round(l7Leads)+"/wk &gt; "+TARGET_HI+") and CPL healthy. Volume already above what's needed."
+        + budgetLineFromCurrent(0, 14, "Cap");
     } else if (salesCame){
       severity = "warn"; action = "Maintain / Cap Budget";
-      detail = "Above-target volume with CPL > "+benchStr+", but sales are coming. Cap budget — don't increase spend; review sales-team backlog before any scale.";
+      detail = "Above-target volume with CPL &gt; "+benchStr+" but sales are coming. Review sales-team backlog before any scale."
+        + budgetLineFromCurrent(0, 14, "Cap");
     } else {
       severity = "warn"; action = "Reduce Budget";
-      detail = "Above-target L7 volume but CPL high ("+cplStr+") and no sales. Reduce budget.";
+      detail = "Above-target L7 volume but CPL high ("+cplStr+") and no sales attributed."
+        + budgetLineFromCurrent(40, 7, "Reduce");
     }
   }
   // CASE C: L7 low (1–3 leads)
   else if (l7Leads != null && l7Leads >= 1 && l7Leads <= 3){
     if (l30Low){
-      // Both L7 and L30 low → look at sales + CTR
       if (salesCame){
         if (ctrWeak){
           severity = "warn"; action = "Test Adjustment";
-          detail = "L7 (<strong>"+Math.round(l7Leads)+"</strong>) &amp; L30 both low but <strong>"+ordStr+" sale"+(orders===1?"":"s")+" came</strong>. CTR is weak ("+ctrStr+" &lt; 1%) &mdash; <strong>refresh creative</strong>.";
+          detail = "L7 (<strong>"+Math.round(l7Leads)+"</strong>) &amp; L30 both low but <strong>"+ordStr+" sale"+(orders===1?"":"s")+" came</strong>. CTR weak ("+ctrStr+" &lt; 1%) &mdash; <strong>refresh creative</strong>. Hold budget; review in 7 days.";
         } else {
           severity = "warn"; action = "Maintain";
-          detail = "L7 &amp; L30 low but sales are coming and CTR is healthy ("+ctrStr+"). Don't pause &mdash; check form, landing page, offer or audience targeting.";
+          detail = "L7 &amp; L30 low but sales coming and CTR healthy ("+ctrStr+"). Don't pause &mdash; check form, landing page, offer or audience. Hold current budget; review in 7 days.";
         }
       } else {
-        // no sales
         if (ctrWeak){
           severity = "fail"; action = "Pause";
           detail = "L7 (<strong>"+Math.round(l7Leads)+"</strong>) &amp; L30 low, <strong>no sales</strong> attributed, CTR weak ("+ctrStr+"). Pause or replace creative.";
         } else {
           severity = "warn"; action = "Test Adjustment";
-          detail = "L7 &amp; L30 low, no sales yet, but CTR healthy ("+ctrStr+"). Check form / landing page / offer / audience before pausing.";
+          detail = "L7 &amp; L30 low, no sales yet, but CTR healthy ("+ctrStr+"). Check form / landing page / offer / audience before pausing. Hold budget; review in 7 days.";
         }
       }
     } else {
-      // L30 still has decent volume, L7 just dipped
       if (cplHealthy){
         severity = "warn"; action = "Maintain";
-        detail = "L7 dipped to <strong>"+Math.round(l7Leads)+"</strong> but L30 still healthy. Don't react to a small weekly sample &mdash; monitor.";
+        detail = "L7 dipped to <strong>"+Math.round(l7Leads)+"</strong> but L30 still healthy. Don't react to small weekly sample &mdash; hold budget and monitor for 7 days.";
       } else {
-        severity = "warn"; action = "Optimize &amp; Monitor";
-        detail = "L7 dipped while CPL is "+cplStr+" (&gt; "+benchStr+"). Monitor next 7 days; reduce budget if trend continues.";
+        severity = "warn"; action = "Reduce Budget";
+        detail = "L7 dipped while CPL is "+cplStr+" (&gt; "+benchStr+")."
+          + budgetLineFromCurrent(25, 7, "Reduce");
       }
     }
   }
@@ -1702,13 +1732,13 @@ function recommendedAction(r, scope){
       detail = "<strong>No L7 leads</strong>, L30 also low, no sales, CTR weak ("+ctrStr+"). Pause.";
     } else if (l30Low){
       severity = "warn"; action = "Test Adjustment";
-      detail = "No L7 leads and L30 also low. Refresh creative or revisit audience / form.";
+      detail = "No L7 leads and L30 also low. Refresh creative or revisit audience / form. Hold budget; review in 7 days.";
     } else {
       severity = "warn"; action = "Optimize &amp; Monitor";
-      detail = "No L7 leads but L30 still has volume &mdash; could be weekly variation. Monitor.";
+      detail = "No L7 leads but L30 still has volume &mdash; could be weekly variation. Hold budget; review in 7 days.";
     }
   }
-  // CASE E: only L30 data available (L7 missing)
+  // CASE E: L7 missing entirely — fall back to L30/Lifetime
   else {
     if (l30Low && !salesCame && ctrWeak){
       severity = "fail"; action = "Pause";
@@ -1717,13 +1747,11 @@ function recommendedAction(r, scope){
       severity = "pass"; action = "Maintain";
       detail = "CPL healthy ("+cplStr+" ≤ "+benchStr+"). Maintain.";
     } else {
-      severity = "warn"; action = "Optimize &amp; Monitor";
-      detail = "Mixed signals &mdash; CPL "+cplStr+" vs benchmark "+benchStr+". Monitor next 7 days.";
+      severity = "warn"; action = "Reduce Budget";
+      detail = "Mixed signals &mdash; CPL "+cplStr+" vs benchmark "+benchStr+"."
+        + budgetLineFromCurrent(20, 7, "Reduce");
     }
   }
-
-  // Reminder note: Valid Ratio intentionally not used as primary trigger
-  // (sales team has a sizeable "not responded" bucket distorting the signal).
 
   const pillClass = severity === "pass" ? "sage" : (severity === "fail" ? "rose" : (severity === "warn" ? "amber" : "neutral"));
   const html = '<span class="pill '+pillClass+' ra-pill">'+action+'</span>';
