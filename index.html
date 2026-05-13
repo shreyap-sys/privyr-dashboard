@@ -1596,61 +1596,135 @@ function metaLearning(r){const wkLeads=r.l7.leads;if(wkLeads==null){return{html:
 
 function recommendedBudget(r){let cpl=r.l30.cpl,basis="Last 30 days";if(cpl==null||isNaN(cpl)||cpl<=0){cpl=r.lifetime.cpl;basis="Lifetime (L30 had no leads)";}if(cpl==null||isNaN(cpl)||cpl<=0){return{html:'<span class="pill neutral">—</span>',detail:"No CPL available to compute a recommendation."};}const weekly=META_LEARNING_THRESHOLD*cpl;const daily=weekly/7;const tag='<span class="pill neutral">'+fmtINR0(weekly)+'/wk</span>';const detail='<span class="strong">'+fmtINR0(weekly)+'/wk</span> &nbsp;·&nbsp; <span class="strong">'+fmtINR0(daily)+'/day</span> &nbsp;to hit '+META_LEARNING_THRESHOLD+' leads/week at '+basis+' CPL <span class="strong">'+fmtINR0(cpl)+'</span>.';return{html:tag,detail};}
 
-function recommendedAction(r){
+function recommendedAction(r, scope){
+  // Scope-specific healthy CPL benchmark.
+  const CPL_BENCH = (scope === "website") ? 300 : 150;
+  const TARGET_LO = 4, TARGET_HI = 8;   // L7 leads/week target range
+  const CTR_BENCH = 1;                  // % — below this is "weak"
+
   const safeNum = v => (v==null || isNaN(v)) ? null : Number(v);
-  const lifeCpl  = safeNum(r.lifetime.cpl),  l30Cpl  = safeNum(r.l30.cpl),  l7Cpl  = safeNum(r.l7.cpl);
-  const lifeL2v  = safeNum(r.lifetime.valid_pct), l30L2v = safeNum(r.l30.valid_pct), l7L2v = safeNum(r.l7.valid_pct);
-  const lifeCpvl = safeNum(r.lifetime.cpvl), l30Cpvl = safeNum(r.l30.cpvl), l7Cpvl = safeNum(r.l7.cpvl);
-  const l7Leads  = safeNum(r.l7.leads),  l30Leads = safeNum(r.l30.leads);
-  const l7Reliable = (l7Leads != null && l7Leads >= 3);
-  if (l30Cpl == null && lifeCpl == null){
-    return { html: '<span class="pill neutral ra-pill">Optimize & Monitor</span>',
-      detail: "Insufficient data &mdash; not enough lead volume yet to call a trend. Watch the next 7 days." };
-  }
-  const cplClimbingL30 = (l30Cpl  != null && lifeCpl != null && l30Cpl  > lifeCpl * 1.15);
-  const cplClimbingL7  = l7Reliable && (l7Cpl != null && l30Cpl != null && l7Cpl > l30Cpl * 1.15);
-  const cplClimbing    = cplClimbingL30 || cplClimbingL7;
-  const cpvlClimbingL30 = (l30Cpvl != null && lifeCpvl != null && l30Cpvl > lifeCpvl * 1.20);
-  const cpvlClimbingL7  = l7Reliable && (l7Cpvl != null && l30Cpvl != null && l7Cpvl > l30Cpvl * 1.20);
-  const cpvlClimbing    = cpvlClimbingL30 || cpvlClimbingL7;
-  const l2vDecliningL30 = (l30L2v != null && lifeL2v != null && l30L2v < lifeL2v - 5);
-  const l2vDecliningL7  = l7Reliable && (l7L2v != null && l30L2v != null && l7L2v < l30L2v - 5);
-  const l2vDeclining    = l2vDecliningL30 || l2vDecliningL7;
-  const trustedL2v = (l30Leads != null && l30Leads >= 5 && l30L2v != null) ? l30L2v : lifeL2v;
-  const l2vHealthy = (trustedL2v != null && trustedL2v >= 25);
+  const l7Leads  = safeNum(r.l7.leads),  l30Leads = safeNum(r.l30.leads), lifeLeads = safeNum(r.lifetime.leads);
+  const l7Cpl    = safeNum(r.l7.cpl),    l30Cpl   = safeNum(r.l30.cpl),   lifeCpl   = safeNum(r.lifetime.cpl);
+  const l7Ctr    = safeNum(r.l7.ctr),    l30Ctr   = safeNum(r.l30.ctr),   lifeCtr   = safeNum(r.lifetime.ctr);
+  const orders   = safeNum(r.orders);
+  const salesCame = orders != null && orders > 0;
+
+  // Trusted CPL: prefer L30 (≥5 leads), fall back to Lifetime. L7 alone is too noisy
+  // for a directional CPL read.
+  const trustedCpl = (l30Leads != null && l30Leads >= 5 && l30Cpl != null) ? l30Cpl : lifeCpl;
+  const cplHealthy = (trustedCpl != null && trustedCpl <= CPL_BENCH);
+  const cplHigh    = (trustedCpl != null && trustedCpl >  CPL_BENCH);
+
+  // Trusted CTR: prefer L30 (≥5 leads), fall back to Lifetime.
+  const trustedCtr = (l30Leads != null && l30Leads >= 5 && l30Ctr != null) ? l30Ctr : lifeCtr;
+  const ctrWeak    = (trustedCtr != null && trustedCtr <  CTR_BENCH);
+  const ctrGood    = (trustedCtr != null && trustedCtr >= CTR_BENCH);
+
+  // L30 "low" volume threshold: roughly under TARGET_LO leads/wk averaged over 4 weeks.
+  const l30Low = (l30Leads != null && l30Leads < TARGET_LO * 4);
+
+  // Build helper text snippets
+  const cplStr = (trustedCpl==null) ? "—" : "₹"+Math.round(trustedCpl).toLocaleString("en-IN");
+  const ctrStr = (trustedCtr==null) ? "—" : trustedCtr.toFixed(2)+"%";
+  const benchStr = "₹"+CPL_BENCH;
+  const ordStr = (orders==null) ? "0" : Math.round(orders).toString();
+
   let severity, action, detail;
-  if (cplClimbing && l2vDeclining){
-    severity = "fail";  action = "Pause";
-    detail = "<strong>CPL climbing</strong> and <strong>lead quality declining</strong> &mdash; efficiency and quality both deteriorating. Pause and revisit once sales process is fixed.";
-  } else if (cplClimbing){
-    if (l2vHealthy){
-      severity = "warn"; action = "Reduce Budget";
-      detail = "<strong>CPL trending upward</strong> but lead quality is healthy ("+(trustedL2v==null?'&mdash;':trustedL2v.toFixed(1)+'%')+" L2V). Reduce budget to slow the burn and reassess in 7 days.";
+
+  if (l7Leads == null && l30Leads == null){
+    return { html: '<span class="pill neutral ra-pill">Optimize &amp; Monitor</span>',
+      detail: "Insufficient data &mdash; not enough lead volume to call. Watch the next 7 days." };
+  }
+
+  // CASE A: L7 leads inside target range (4–8/wk)
+  if (l7Leads != null && l7Leads >= TARGET_LO && l7Leads <= TARGET_HI){
+    if (cplHealthy){
+      severity = "pass"; action = "Maintain";
+      detail = "L7 leads in target range ("+Math.round(l7Leads)+"/wk) and CPL healthy ("+cplStr+" ≤ "+benchStr+"). Keep as-is.";
+    } else if (salesCame){
+      severity = "warn"; action = "Maintain";
+      detail = "CPL above benchmark ("+cplStr+" > "+benchStr+") but <strong>"+ordStr+" sale"+(orders===1?"":"s")+" came</strong> from this ad. Maintain &mdash; scale cautiously only if sales capacity allows; otherwise cap budget.";
     } else {
+      severity = "warn"; action = "Reduce Budget";
+      detail = "L7 volume on target ("+Math.round(l7Leads)+"/wk) but CPL above benchmark ("+cplStr+" > "+benchStr+") and no sales attributed yet. Reduce spend.";
+    }
+  }
+  // CASE B: L7 above target (>8/wk) → we already have enough volume
+  else if (l7Leads != null && l7Leads > TARGET_HI){
+    if (cplHealthy){
+      severity = "pass"; action = "Maintain / Cap Budget";
+      detail = "L7 volume <strong>above target</strong> ("+Math.round(l7Leads)+"/wk &gt; "+TARGET_HI+") and CPL healthy. Cap budget &mdash; do not scale; volume is already above what's needed.";
+    } else if (salesCame){
+      severity = "warn"; action = "Maintain / Cap Budget";
+      detail = "Above-target volume with CPL > "+benchStr+", but sales are coming. Cap budget — don't increase spend; review sales-team backlog before any scale.";
+    } else {
+      severity = "warn"; action = "Reduce Budget";
+      detail = "Above-target L7 volume but CPL high ("+cplStr+") and no sales. Reduce budget.";
+    }
+  }
+  // CASE C: L7 low (1–3 leads)
+  else if (l7Leads != null && l7Leads >= 1 && l7Leads <= 3){
+    if (l30Low){
+      // Both L7 and L30 low → look at sales + CTR
+      if (salesCame){
+        if (ctrWeak){
+          severity = "warn"; action = "Test Adjustment";
+          detail = "L7 (<strong>"+Math.round(l7Leads)+"</strong>) &amp; L30 both low but <strong>"+ordStr+" sale"+(orders===1?"":"s")+" came</strong>. CTR is weak ("+ctrStr+" &lt; 1%) &mdash; <strong>refresh creative</strong>.";
+        } else {
+          severity = "warn"; action = "Maintain";
+          detail = "L7 &amp; L30 low but sales are coming and CTR is healthy ("+ctrStr+"). Don't pause &mdash; check form, landing page, offer or audience targeting.";
+        }
+      } else {
+        // no sales
+        if (ctrWeak){
+          severity = "fail"; action = "Pause";
+          detail = "L7 (<strong>"+Math.round(l7Leads)+"</strong>) &amp; L30 low, <strong>no sales</strong> attributed, CTR weak ("+ctrStr+"). Pause or replace creative.";
+        } else {
+          severity = "warn"; action = "Test Adjustment";
+          detail = "L7 &amp; L30 low, no sales yet, but CTR healthy ("+ctrStr+"). Check form / landing page / offer / audience before pausing.";
+        }
+      }
+    } else {
+      // L30 still has decent volume, L7 just dipped
+      if (cplHealthy){
+        severity = "warn"; action = "Maintain";
+        detail = "L7 dipped to <strong>"+Math.round(l7Leads)+"</strong> but L30 still healthy. Don't react to a small weekly sample &mdash; monitor.";
+      } else {
+        severity = "warn"; action = "Optimize &amp; Monitor";
+        detail = "L7 dipped while CPL is "+cplStr+" (&gt; "+benchStr+"). Monitor next 7 days; reduce budget if trend continues.";
+      }
+    }
+  }
+  // CASE D: zero L7 leads
+  else if (l7Leads != null && l7Leads === 0){
+    if (l30Low && !salesCame && ctrWeak){
       severity = "fail"; action = "Pause";
-      detail = "<strong>CPL climbing</strong> and L2V below the 25% threshold ("+(trustedL2v==null?'&mdash;':trustedL2v.toFixed(1)+'%')+"). Not efficient for current capacity &mdash; pause.";
-    }
-  } else if (l2vDeclining){
-    if (cpvlClimbing){
-      severity = "warn"; action = "Reduce Budget";
-      detail = "<strong>Lead quality declining</strong> while CPVL climbs &mdash; valid leads getting more expensive. Reduce spend and review audience/creative.";
+      detail = "<strong>No L7 leads</strong>, L30 also low, no sales, CTR weak ("+ctrStr+"). Pause.";
+    } else if (l30Low){
+      severity = "warn"; action = "Test Adjustment";
+      detail = "No L7 leads and L30 also low. Refresh creative or revisit audience / form.";
     } else {
-      severity = "warn"; action = "Optimize & Monitor";
-      detail = "<strong>Lead quality declining</strong> over time. Narrow audience or refresh creative; watch CPVL over the next 7 days.";
+      severity = "warn"; action = "Optimize &amp; Monitor";
+      detail = "No L7 leads but L30 still has volume &mdash; could be weekly variation. Monitor.";
     }
-  } else if (cpvlClimbing && !l2vHealthy){
-    severity = "warn"; action = "Test Adjustment";
-    detail = "<strong>CPVL trending up</strong> with sub-25% L2V. Test a tighter audience / lower bid / creative refresh and observe for 7 days.";
-  } else if (l2vHealthy){
-    severity = "pass"; action = "Maintain";
-    detail = "Stable CPL, healthy lead quality ("+(trustedL2v==null?'&mdash;':trustedL2v.toFixed(1)+'%')+" L2V). Keep budget as-is.";
-  } else {
-    severity = "warn"; action = "Optimize & Monitor";
-    detail = "Mixed signals &mdash; CPL hasn't trended up but L2V is below 25%. Monitor quality over the next 7 days before scaling.";
   }
-  if (l7Leads != null && !l7Reliable){
-    detail += ' <em class="l7-thin">L7 sample thin ('+Math.round(l7Leads)+' leads) &mdash; relying on L30/Lifetime.</em>';
+  // CASE E: only L30 data available (L7 missing)
+  else {
+    if (l30Low && !salesCame && ctrWeak){
+      severity = "fail"; action = "Pause";
+      detail = "L30 volume low, no sales, CTR weak ("+ctrStr+"). Pause.";
+    } else if (cplHealthy){
+      severity = "pass"; action = "Maintain";
+      detail = "CPL healthy ("+cplStr+" ≤ "+benchStr+"). Maintain.";
+    } else {
+      severity = "warn"; action = "Optimize &amp; Monitor";
+      detail = "Mixed signals &mdash; CPL "+cplStr+" vs benchmark "+benchStr+". Monitor next 7 days.";
+    }
   }
+
+  // Reminder note: Valid Ratio intentionally not used as primary trigger
+  // (sales team has a sizeable "not responded" bucket distorting the signal).
+
   const pillClass = severity === "pass" ? "sage" : (severity === "fail" ? "rose" : (severity === "warn" ? "amber" : "neutral"));
   const html = '<span class="pill '+pillClass+' ra-pill">'+action+'</span>';
   return { html, detail };
@@ -1717,7 +1791,7 @@ function renderTable(){
   sorted.forEach((r,idx)=>{
     const learn=metaLearning(r);
     const budget=recommendedBudget(r);
-    const action=recommendedAction(r);
+    const action=recommendedAction(r,"privyr");
     const ordersTxt=(r.orders==null)?'<span class="span-cell-inner muted">—</span>':fmtInt(r.orders);
     const revenueTxt=(r.revenue==null||r.revenue===0)?'<span class="span-cell-inner muted">—</span>':fmtINR0(r.revenue);
     const ordersClass=(r.orders==null||r.orders===0)?"span-cell muted":"span-cell";
@@ -1856,7 +1930,7 @@ function renderWebsiteTable(){
   sorted.forEach((r,idx)=>{
     const learn = metaLearning(r);
     const budget = recommendedBudget(r);
-    const action = recommendedAction(r);
+    const action = recommendedAction(r,"website");
     const ordersTxt = (r.orders==null)?'<span class="span-cell-inner muted">&mdash;</span>':fmtInt(r.orders);
     const revenueTxt = (r.revenue==null||r.revenue===0)?'<span class="span-cell-inner muted">&mdash;</span>':fmtINR0(r.revenue);
     const ordersClass = (r.orders==null||r.orders===0)?"span-cell muted":"span-cell";
