@@ -212,6 +212,11 @@
   .row-action .l7-thin{font-size:11px;color:var(--ink-muted);font-style:italic;margin-left:4px}
   .row-action .ra-budget{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:6px;background:#f6efff;border:1px solid #e3d3f3;color:#3a2552;font-style:normal;font-size:12px;letter-spacing:.005em}
   .row-action .ra-budget strong{color:#6f2da8;font-weight:800}
+  /* Scale → bright green; Reduce → dark red */
+  .row-action .ra-budget.ra-scale{background:#dcfce7;border-color:#86efac;color:#14532d}
+  .row-action .ra-budget.ra-scale strong{color:#16a34a;font-weight:900}
+  .row-action .ra-budget.ra-reduce{background:#fee2e2;border-color:#fca5a5;color:#7f1d1d}
+  .row-action .ra-budget.ra-reduce strong{color:#b91c1c;font-weight:900}
   .info-row td.info{padding:10px 14px;font-size:12.5px;color:var(--ink-soft)}
   .info-row .lbl{display:inline-block;min-width:162px;font-weight:600;color:var(--ink);margin-right:8px;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
   .info-row .detail{color:var(--ink-soft)}
@@ -882,7 +887,9 @@ const PAE_LABEL_KEY={
   "cac":["CAC","CAC (₹)"],
   "roas":["ROAS","ROAS (x)"],
   "h2o":["Home Visits → Order %","Home Visits -> Order %"],
-  "v2o":["Valid Lead → Order %","Valid Lead -> Order %"]
+  "v2o":["Valid Lead → Order %","Valid Lead -> Order %"],
+  "total_leads":["Total Leads"],
+  "true_cpl":["True CPL","True CPL (₹)"]
 };
 function paeNorm(s){return String(s||"").replace(/\\_/g,"_").replace(/\s+/g," ").trim();}
 const PAE_COL_INDICES={privyr:{lifetime:2,l30:5,l7:8}, website:{lifetime:3,l30:6,l7:9}};
@@ -1637,17 +1644,19 @@ function recommendedAction(r, scope){
   const fmtRupee = n => "₹"+Math.round(n).toLocaleString("en-IN");
   function budgetLineFromCurrent(pct, days, verb){
     // verb = "Reduce" / "Cap" / "Scale"
-    if (curBudget == null) return ' <em class="ra-budget">'+verb+" by ~"+pct+"% from current ad-set budget; review in "+days+" days.</em>";
+    const verbCls = verb === "Reduce" ? "ra-reduce" : (verb === "Scale" ? "ra-scale" : "ra-cap");
+    if (curBudget == null) return ' <em class="ra-budget '+verbCls+'">'+verb+" by ~"+pct+"% from current ad-set budget; review in "+days+" days.</em>";
     const factor = verb === "Reduce" ? (1 - pct/100)
                 : verb === "Scale"   ? (1 + pct/100)
                 : 1; // Cap = stay at current
     const newBudget = Math.round(curBudget * factor);
     if (verb === "Cap"){
-      return ' <em class="ra-budget"><strong>Cap at '+fmtRupee(curBudget)+'/day</strong> for the next '+days+' days. Do not increase.</em>';
+      return ' <em class="ra-budget '+verbCls+'"><strong>Cap at '+fmtRupee(curBudget)+'/day</strong> for the next '+days+' days. Do not increase.</em>';
     }
     const delta = Math.round(curBudget * pct/100);
     const arrow = verb === "Reduce" ? "&darr;" : "&uarr;";
-    return ' <em class="ra-budget"><strong>'+verb+' by '+pct+'%</strong> &mdash; '+fmtRupee(curBudget)+'/day '+arrow+' '+fmtRupee(newBudget)+'/day (&minus;'+(verb==="Reduce"?"":"+")+fmtRupee(delta)+'). Review in '+days+' days.</em>';
+    const signTxt = verb === "Reduce" ? "&minus;" : "+";
+    return ' <em class="ra-budget '+verbCls+'"><strong>'+verb+' by '+pct+'%</strong> &mdash; '+fmtRupee(curBudget)+'/day '+arrow+' '+fmtRupee(newBudget)+'/day ('+signTxt+fmtRupee(delta)+'). Review in '+days+' days.</em>';
   }
 
   // Build helper text snippets
@@ -2205,7 +2214,10 @@ function renderFunnelColumn(pae,pk){
   const lead2order  = (leadsV  && leadsV>0  && ordersV!=null) ? (ordersV/leadsV)*100  : null;
   const valid2order = (validV  && validV>0  && ordersV!=null) ? (ordersV/validV)*100  : null;
   const visit2order = (hvV     && hvV>0     && ordersV!=null) ? (ordersV/hvV)*100     : null;
+  const SPEND_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
   const steps=[
+    {id:"spend",       icon:SPEND_ICON,     label:"Spend",        value:g("spend"),       prevName:null,    conv:null,     costLbl:null,        cost:null,           fmt:fmtINR0, isSpend:true},
+    {id:"total_leads", icon:F_ICONS.leads,  label:"Total Leads",  value:g("total_leads"), prevName:null,    conv:null,     costLbl:"True CPL",  cost:g("true_cpl"),  fmt:fmtInt},
     {id:"leads",   icon:F_ICONS.leads,   label:"Leads",       value:g("leads"),   prevName:null,    conv:null,        costLbl:"CPL",  cost:g("cpl"),  fmt:fmtInt},
     {id:"valid",   icon:F_ICONS.valid,   label:"Valid Leads", value:g("valid"),   prevName:"Leads", conv:g("l2v"),    costLbl:"CPVL", cost:g("cpvl"), fmt:fmtInt},
     {id:"bt",      icon:F_ICONS.bt,      label:"Brief Taken", value:g("bt"),      prevName:"Valid", conv:g("v2b"),    costLbl:"CPBT", cost:g("cpbt"), fmt:fmtInt},
@@ -2277,7 +2289,8 @@ function renderFunnelColumn(pae,pk){
         +'</div>';
     } else {
       const metaHtml='<div class="fs-meta">'+convLine+costLine+'</div>';
-      h+='<div class="funnel-step '+wcls+'">'
+      const extraCls = s.isSpend?' spend':'';
+      h+='<div class="funnel-step '+wcls+extraCls+'">'
          +'<div class="fs-icon">'+s.icon+'</div>'
          +'<div class="fs-label">'+s.label+'</div>'
          +'<div class="fs-value">'+valFmt+'</div>'
