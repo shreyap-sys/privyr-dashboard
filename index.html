@@ -965,7 +965,9 @@ function parsePAEFromNL(content, scope){
 
 const SUMMARY_KEY_DEFS = [
   ["spend","total spend"],
-  ["leads","total leads"],
+  ["total_leads","total leads"],
+  ["true_cpl","true cpl"],
+  ["leads","leads (\\#)","leads"],
   ["cpl","cpl"],
   ["valid","valid lead"],
   ["cpvl","cpvl"],
@@ -1182,6 +1184,8 @@ function renderSummaryFunnel(){
 function renderSummaryFunnelColumn(sd, pk){
   const g = k => (sd[k] && typeof sd[k][pk]==="number") ? sd[k][pk] : null;
   const leadsV = g("leads"), validV = g("valid"), hvV = g("hv"), ordersV = g("perfOrders");
+  const totalLeadsV = g("total_leads");
+  const total2leadsPct = (totalLeadsV && totalLeadsV>0 && leadsV != null) ? (leadsV/totalLeadsV)*100 : null;
   const lead2order  = (leadsV  && leadsV>0  && ordersV!=null) ? (ordersV/leadsV)*100  : null;
   const valid2order = (validV  && validV>0  && ordersV!=null) ? (ordersV/validV)*100  : null;
   const visit2order = (hvV     && hvV>0     && ordersV!=null) ? (ordersV/hvV)*100     : null;
@@ -1189,8 +1193,9 @@ function renderSummaryFunnelColumn(sd, pk){
   const SPEND_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
 
   const steps = [
-    {id:"spend",   icon:SPEND_ICON,       label:"Spend",       value:g("spend"),       prevName:null,    conv:null,     costLbl:null,    cost:null,         fmt:fmtINR0, isSpend:true},
-    {id:"leads",   icon:F_ICONS.leads,    label:"Leads",       value:g("leads"),       prevName:null,    conv:null,     costLbl:"CPL",   cost:g("cpl"),     fmt:fmtInt},
+    {id:"spend",       icon:SPEND_ICON,    label:"Spend",       value:g("spend"),       prevName:null,    conv:null,             costLbl:null,        cost:null,             fmt:fmtINR0, isSpend:true},
+    {id:"total_leads", icon:F_ICONS.leads, label:"Total Leads", value:g("total_leads"), prevName:null,    conv:null,             costLbl:"True CPL",  cost:g("true_cpl"),    fmt:fmtInt},
+    {id:"leads",       icon:F_ICONS.leads, label:"Leads",       value:g("leads"),       prevName:"Total Leads", conv:total2leadsPct, costLbl:"CPL",       cost:g("cpl"),         fmt:fmtInt},
     {id:"valid",   icon:F_ICONS.valid,    label:"Valid Leads", value:g("valid"),       prevName:"Leads", conv:g("l2v"), costLbl:"CPVL",  cost:g("cpvl"),    fmt:fmtInt},
     {id:"bt",      icon:F_ICONS.bt,       label:"Brief Taken", value:g("bt"),          prevName:"Valid", conv:g("v2b"), costLbl:"CPBT",  cost:g("cpbt"),    fmt:fmtInt},
     {id:"hv",      icon:F_ICONS.hv,       label:"Home Visits", value:g("hv"),          prevName:"Brief", conv:g("b2h"), costLbl:"CPHV",  cost:g("cphv"),    fmt:fmtInt},
